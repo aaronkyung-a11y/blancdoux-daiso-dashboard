@@ -293,7 +293,7 @@ footer a{color:var(--accent);text-decoration:none}
       🔄 마지막 업데이트 2026-04-27
     </span>
     <span style="background:rgba(110,231,255,0.14);color:var(--accent);padding:8px 14px;border-radius:100px;border:1px solid rgba(110,231,255,0.28);font-weight:700">
-      이번에 바뀐 항목 <b>9개</b>
+      이번에 바뀐 항목 <b>7개</b>
     </span>
     <a href="#changelog" style="color:var(--muted);text-decoration:none;font-size:12px;border-bottom:1px dashed var(--muted);padding-bottom:1px">변경 이력 보기 ↓</a>
   </div>
@@ -339,7 +339,7 @@ footer a{color:var(--accent);text-decoration:none}
     <div style="margin-top:22px;padding:18px 22px;background:rgba(248,113,113,0.08);border-left:3px solid var(--bad);border-radius:0 12px 12px 0;">
       <div style="font-size:12px;letter-spacing:1.5px;color:var(--bad);font-weight:700;margin-bottom:6px;">⚠ 리스크</div>
       <div style="font-size:14px;color:#e6ebf6;line-height:1.65">
-        현재 유가 계약 5명이 <b style="color:var(--bad)">100% 신규 저점매수</b> — 월별 뷰 예측이 안 됨. 검증된 인플루언서 재계약 비중을 <b style="color:#fff">70%</b>로 즉시 조정 권고.
+        유가협업 누적 93명 중 <b style="color:#fff">검증재활용형 31명(33%)·중간형 37명(40%)·저점매수형 25명(27%)</b>으로 분포. 저점매수형 평균 <b style="color:var(--bad)">8,029뷰</b> vs 검증재활용형 평균 <b style="color:var(--good)">131,044뷰</b> — <b style="color:#fff">16배 격차</b>. 신규 계약 시 검증풀 우선 권고.
         결광 세럼미스트 <b style="color:var(--bad)">-5.5%</b>은 별도 원인 규명 필요.
       </div>
     </div>
@@ -678,42 +678,43 @@ footer a{color:var(--accent);text-decoration:none}
 
   <!-- OPINION: 저점매수 vs 재활용 -->
   <div class="card" style="margin-bottom:22px;border-color:rgba(251,191,36,0.4)">
-    <h3>🗣️ Opinion — "저점매수"만 고집하지 말고 "검증된 재활용"도 주축으로 가야 합니다</h3>
-    <div class="sub">현재 계약 5명이 모두 신규 저점매수라는 점 + 모니터링 데이터 교차 분석 결과</div>
+    <h3>🗣️ Opinion — 유가 계약 풀 분석 (93명) · "검증재활용형 비중 확대"가 답</h3>
+    <div class="sub">모니터링 시트의 노출 유형 컬럼에서 추출 · 진행건수·팔로워·평균뷰로 분류</div>
 
-    <div class="abs-rel" style="margin-top:8px">
-      <div class="side">
-        <h5>저점매수 트랙 (신규 발굴 · 팔로워&lt;1만 무가시딩)</h5>
-        <div class="big" style="color:var(--warn)">228건 · 평균 17,988뷰</div>
-        <div class="desc">• 장점: 계약단가 낮음, V/S 비율 높은 "가성비 대박"이 간혹 터짐<br>
-        • 단점: 성공률 낮음(1만뷰+ 28%), 대부분 5천뷰 미만으로 사장됨<br>
-        • 역할: <strong style="color:#fff">볼륨 확보·가끔 터지는 복권형</strong></div>
+    <div class="grid g3" style="gap:16px;margin-top:8px">
+      <div style="background:linear-gradient(135deg,rgba(74,222,128,0.12),transparent);border:1px solid rgba(74,222,128,0.35);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--good);font-weight:800;margin-bottom:8px">검증재활용형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">31명 (33%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">진행건수 ≥2 또는 평균 10만뷰+ 검증<br>평균 <b style="color:var(--good)">131,044뷰/건</b><br><span style="color:var(--muted);font-size:12px">예: 도로·Nuki·코덕요정·ubsi·쥬바비</span></div>
       </div>
-      <div class="side highlight" style="background:linear-gradient(135deg,rgba(74,222,128,0.12),transparent);border-color:var(--good)">
-        <h5>검증된 재활용 트랙 (복수건 평균 5만뷰+)</h5>
-        <div class="big" style="color:var(--good)">20+명 · 평균 10만~170만뷰</div>
-        <div class="desc">• 장점: <strong style="color:#fff">예측 가능성 압도적</strong>, 이미 우리 제품 경험·톤 파악<br>
-        • 단점: 소위 "인플루언서 피로도" — 같은 제품 반복 시 뷰 감소 가능<br>
-        • 역할: <strong style="color:#fff">안정적 허리 + 캠페인 론칭 즉시 볼륨</strong></div>
+      <div style="background:rgba(20,26,46,0.55);border:1px solid var(--border);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--warn);font-weight:800;margin-bottom:8px">중간형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">37명 (40%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">단건 진행 / 팔로워 ≥1만<br>평균 <b style="color:#fff">18,349뷰/건</b><br><span style="color:var(--muted);font-size:12px">2회차 결과 보고 검증풀 승격 판단</span></div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(248,113,113,0.12),transparent);border:1px solid rgba(248,113,113,0.35);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--bad);font-weight:800;margin-bottom:8px">저점매수형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">25명 (27%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">단건 진행 / 팔로워 &lt;1만<br>평균 <b style="color:var(--bad)">8,029뷰/건</b><br><span style="color:var(--muted);font-size:12px">검증재활용형 대비 1/16 효율</span></div>
       </div>
     </div>
 
     <div class="diag good" style="margin-top:18px">
-      <strong>💡 제 의견 — "7:3 믹스"를 권고합니다</strong>
+      <strong>💡 권고 — 신규 계약 비중 재조정 (검증재활용형 50% / 중간형 30% / 저점매수형 20%)</strong>
       <p>
-      현재 5명 계약 100%가 "신규 저점매수"인 건 <span class="hl-bad">구조적 위험</span>입니다.
-      저점매수는 본질적으로 "복권 사는 것"이라 성공률 28%·대박률 8%. 반면 <strong style="color:#fff">이미 우리 제품으로 10만뷰+를 낸 20명은 확률이 이미 검증된 자산</strong>입니다.<br><br>
-      저점매수 <span class="hl">70%(볼륨·가성비 베팅)</span> + 검증된 재활용 <span class="hl">30%(안정 허리)</span>로 믹스해야,
-      1) 월별 최소 뷰 확보가 예측 가능해지고, 2) 저점매수가 모두 실패해도 캠페인 전체가 안 깨지며, 3) 재활용 인플루언서의 2차·3차 콘텐츠로 <strong style="color:#fff">제품 스토리 아크</strong>를 만들 수 있습니다.
-      특히 결광 스킨핏프렙처럼 가속 중인 SKU는 "새로운 사람 발굴"보다 "이미 터뜨린 사람에게 결광 라인으로 확장 계약"이 훨씬 효율적입니다.
+      현재 분포는 <span class="hl">검증재활용 33% / 중간 40% / 저점매수 27%</span>인데, <strong style="color:#fff">평균뷰 격차가 검증:저점 = 16배</strong>라서 저점매수형 비중을 자연 감소시키고 검증풀을 늘리는 방향이 ROI 측면에서 명백합니다. 특히 결광 스킨핏프렙처럼 가속 중인 SKU는 "새로운 사람 발굴"보다 "이미 터뜨린 사람에게 결광 라인으로 확장 계약"이 효율적입니다.<br><br>
+      최근 6주(W12+) 활동 중인 유가 인플루언서는 <strong style="color:#fff">44명</strong>입니다. 이 중 검증재활용형부터 결광 스킨핏프렙·물광 크림 시즌 계약 우선 확장 권고.
       </p>
     </div>
 
     <div class="diag warn" style="margin-top:14px">
       <strong>⚠️ "인플루언서 피로도" 관리법</strong>
-      <p>같은 인플루언서 반복 사용 시 뷰가 감소할 수 있다는 우려가 맞습니다. 다만 모니터링 데이터를 보면
-      <strong style="color:#fff">도로(@dorotice5)는 3건 연속 100만뷰+, ubsi·살림토끼는 4건 중 4건 10만뷰+</strong>로 <span class="hl-good">피로도가 거의 없다</span>는 게 실측됩니다.
-      핵심은 ① 제품/라인을 바꿔가며 의뢰, ② 3개월 간격 유지, ③ 같은 포맷 반복 대신 새로운 앵글(성분 리뷰 → 비포&애프터 → 친구 추천 등) 요청 — 이 3가지만 지키면 피로도는 실질적 문제가 아닙니다.</p>
+      <p>같은 인플루언서 반복 사용 시 뷰 감소 우려에 대해 — 모니터링 데이터로 보면 <strong style="color:#fff">ubsi(@Whoop_sie) 4건 평균 31.9만뷰, 살림토끼 4건 평균 20.3만뷰, 코덕요정 4건 평균 27.2만뷰</strong>로 <span class="hl-good">피로도 신호가 거의 없습니다</span>. 핵심은 ① 제품/라인을 바꿔가며 의뢰, ② 3개월 간격 유지, ③ 같은 포맷 반복 대신 새로운 앵글 요청 — 이 3가지만 지키면 검증풀은 캠페인 자산입니다.</p>
+    </div>
+
+    <div class="diag" style="margin-top:14px">
+      <strong>📋 무가시딩 풀 실측 (참고)</strong>
+      <p>무가시딩 누적 <strong style="color:#fff">337명 · 423건</strong> 진행. 팔로워&lt;1만 채널 176명 평균 <b>15,000뷰</b>. 무가 콘텐츠 1만뷰+ 성공률 <b>17%</b>·10만뷰+ 대박률 <b>5%</b>. 유가 저점매수형보다 무가시딩이 가성비 측면에서 우수 — 신규 발굴은 무가시딩으로, 유가는 검증풀 위주로.</p>
     </div>
   </div>
 
@@ -1012,8 +1013,8 @@ footer a{color:var(--accent);text-decoration:none}
   <div class="action-item">
     <div class="pri p1">P1</div>
     <div>
-      <div class="action-title">[NEW] 검증된 재활용 TOP 12에 즉시 재계약 제안 (저점매수 70% + 재활용 30% 믹스)</div>
-      <div class="action-desc">현재 계약 5명이 100% 신규 저점매수 — 구조적 위험. 도로·Nuki·코덕요정·ubsi·쥬바비·한채영·살림토끼 등 이미 우리 제품으로 10만뷰+ 검증된 12명에게 1~2주 내 결광 라인 재계약 제안서 발송. 월별 최소 뷰 예측 가능성 확보</div>
+      <div class="action-title">[NEW] 검증재활용형 31명 결광 라인 확장 계약 (재활용 50% + 중간 30% + 저점 20% 권고 믹스)</div>
+      <div class="action-desc">유가 계약 풀 93명 중 검증재활용형은 31명(33%)으로 평균 131,044뷰. 도로·Nuki·코덕요정·ubsi·쥬바비·한채영·살림토끼 등에게 결광 스킨핏프렙·물광 크림 시즌 계약 1~2주 내 발송. 저점매수형(25명, 평균 8,029뷰)은 자연 감소 + 무가시딩으로 대체.</div>
     </div>
     <div class="action-owner">인플루언서팀 · 2주</div>
   </div>
@@ -1109,7 +1110,7 @@ footer a{color:var(--accent);text-decoration:none}
   <div class="section-desc">매 격주 월요일 09:00에 자동 실행되는 업데이트의 변경 이력입니다. 이전 값 → 새 값 형식으로 표기.</div>
   <div id="changelogList" class="card" style="padding:8px 0"></div>
 </section>
-<script id="changelog-data" type="application/json">[{"date": "2026-04-27", "summary": "다이소 일별매출 RAW 통합 + 변경 이력 시작", "changes": ["누적 매출 41.97억(108일) → 42.9억(111일)", "일평균 3,890만원 → 3,865만원", "라인별 비중: 물광 54% / 결광 39% / 옴므 6.6% → 물광 54.1% / 결광 39.3% / 옴므 6.6%", "코어3종 집중도 63% → 63.1%", "결광 스킨핏프렙 최근 2주 +18.7% → +10.8% (W15+W16 vs W13+W14)", "결광 세럼미스트 최근 2주 -17.7% → -5.5% (급감 완화)", "물광 라인 최근 2주 +3.9% / 결광 +5.5% / 옴므 -11.9%", "주차별 매출 차트에 W17(부분) 추가", "다이소 일별매출 RAW를 매 격주 자동 반영하도록 SKILL.md 갱신"]}, {"date": "2026-04-24", "summary": "모니터링 시트 자동 갱신 (1회차)", "changes": ["모니터링 콘텐츠 957건 → 965건", "누적 노출 2,944만 뷰 → 3,432만 뷰", "평균 30,765 뷰/건 → 35,569 뷰/건", "X(트위터) 누적 1,594만 뷰 (377→378건)", "라인×타입 매트릭스 재계산 (CH 퍼펙트 무가 83,138 → 82,665 등)"]}]</script>
+<script id="changelog-data" type="application/json">[{"date": "2026-04-27", "summary": "유가 계약 narrative를 모니터링 데이터 기반으로 재작성", "changes": ["유가협업 unique 채널 93명 분류: 검증재활용형 31명(33%)·중간형 37명(40%)·저점매수형 25명(27%)", "TL;DR 리스크 박스: \"5명 100% 저점매수\" 추정 → 실측 분포로 교체", "Part 4 Opinion 카드 전면 재작성 (저점매수 70:재활용 30 → 재활용 50:중간 30:저점 20 권고)", "검증재활용형 평균뷰 131,044 vs 저점매수형 평균뷰 8,029 — 16배 격차 명시", "무가시딩 실측: 337명·423건, 1만뷰+ 17%·10만뷰+ 5%로 보정 (이전 28%/8% 추정값 교체)", "Action Plan P1 첫 항목 권고 믹스 비율 수정", "최근 6주(W12+) 활동 중 유가 인플루언서 44명 명시"]}, {"date": "2026-04-27", "summary": "다이소 일별매출 RAW 통합 + 변경 이력 시작", "changes": ["누적 매출 41.97억(108일) → 42.9억(111일)", "일평균 3,890만원 → 3,865만원", "라인별 비중: 물광 54% / 결광 39% / 옴므 6.6% → 물광 54.1% / 결광 39.3% / 옴므 6.6%", "코어3종 집중도 63% → 63.1%", "결광 스킨핏프렙 최근 2주 +18.7% → +10.8% (W15+W16 vs W13+W14)", "결광 세럼미스트 최근 2주 -17.7% → -5.5% (급감 완화)", "물광 라인 최근 2주 +3.9% / 결광 +5.5% / 옴므 -11.9%", "주차별 매출 차트에 W17(부분) 추가", "다이소 일별매출 RAW를 매 격주 자동 반영하도록 SKILL.md 갱신"]}, {"date": "2026-04-24", "summary": "모니터링 시트 자동 갱신 (1회차)", "changes": ["모니터링 콘텐츠 957건 → 965건", "누적 노출 2,944만 뷰 → 3,432만 뷰", "평균 30,765 뷰/건 → 35,569 뷰/건", "X(트위터) 누적 1,594만 뷰 (377→378건)", "라인×타입 매트릭스 재계산 (CH 퍼펙트 무가 83,138 → 82,665 등)"]}]</script>
 <script>
 (function(){
   var data = JSON.parse(document.getElementById('changelog-data').textContent);
