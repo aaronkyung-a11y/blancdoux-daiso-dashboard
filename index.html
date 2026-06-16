@@ -1,1264 +1,1474 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>뷰티 × Instagram 릴스 대시보드 (다이소 / 올리브영)</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>더랩바이블랑두 × 다이소 전략 진단 대시보드 (2026.06.16)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-    min-height: 100vh;
-    padding: 32px;
-  }
-  .container { max-width: 1400px; margin: 0 auto; }
-  header {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 16px; padding-bottom: 16px;
-  }
-  h1 { font-size: 26px; font-weight: 700; color: #f1f5f9; }
-  .subtitle { color: #94a3b8; font-size: 13px; margin-top: 4px; }
-  .timestamp { color: #64748b; font-size: 13px; font-family: 'SF Mono', monospace; }
+:root{
+  --bg:#0a0e1a; --panel:#141a2e; --panel2:#1a2140; --border:#263059;
+  --text:#eef2fb; --muted:#9aa3bb; --accent:#6ee7ff; --accent2:#a78bfa;
+  --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
+  --x:#1d9bf0; --yt:#ff4d4f; --ig:#e1306c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px}
+body{
+  font-family:-apple-system,"SF Pro Display","Pretendard","Noto Sans KR",sans-serif;
+  background:linear-gradient(135deg,#05070f 0%,#0a0e1a 50%,#0e132a 100%);
+  color:var(--text);min-height:100vh;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1400px;margin:0 auto;padding:48px 36px 100px}
 
-  .tabs {
-    display: flex; gap: 0; margin-bottom: 28px;
-    border-bottom: 2px solid #334155;
-  }
-  .tab-btn {
-    background: transparent; border: none; outline: none; cursor: pointer;
-    padding: 14px 28px; font-size: 15px; font-weight: 600; color: #64748b;
-    border-bottom: 3px solid transparent; margin-bottom: -2px;
-    transition: all 0.15s; font-family: inherit;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .tab-btn:hover { color: #cbd5e1; }
-  .tab-btn.active {
-    color: #f1f5f9; border-bottom-color: #38bdf8;
-  }
-  .tab-btn.oliveyoung.active { border-bottom-color: #10b981; }
-  .tab-btn.youtube.active { border-bottom-color: #ef4444; }
-  .tab-btn .dot {
-    width: 7px; height: 7px; border-radius: 50%; display: inline-block;
-  }
-  .tab-btn .dot.daiso { background: #38bdf8; }
-  .tab-btn .dot.oliveyoung { background: #10b981; }
-  .tab-btn .dot.youtube { background: #ef4444; }
-  .yt-iframe-wrap {
-    border: 1px solid #334155; border-radius: 12px; overflow: hidden;
-    background: #0f172a; min-height: 80vh;
-  }
-  .yt-iframe-wrap iframe {
-    width: 100%; height: 82vh; border: 0; display: block;
-  }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+/* Header */
+header.hero{
+  background:linear-gradient(135deg,#1a1f3d 0%,#111633 100%);
+  border:1px solid var(--border);border-radius:28px;
+  padding:56px 56px 48px;margin-bottom:40px;
+  position:relative;overflow:hidden;
+}
+header.hero::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 85% 15%,rgba(167,139,250,0.18) 0%,transparent 50%),
+    radial-gradient(circle at 15% 85%,rgba(110,231,255,0.14) 0%,transparent 50%);
+  pointer-events:none;
+}
+.hero-meta{font-size:14px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;font-weight:500}
+h1{font-size:44px;font-weight:800;line-height:1.2;margin-bottom:16px;
+  background:linear-gradient(90deg,#eef2fb 0%,#a78bfa 60%,#6ee7ff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub{font-size:18px;color:#c6cee4;max-width:880px;line-height:1.7}
+.badges{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.badge{font-size:13px;background:rgba(110,231,255,0.14);color:var(--accent);
+  padding:8px 16px;border-radius:100px;border:1px solid rgba(110,231,255,0.3);font-weight:500}
+.badge.purple{background:rgba(167,139,250,0.14);color:var(--accent2);border-color:rgba(167,139,250,0.3)}
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
-  .grid-1 { margin-bottom: 32px; }
-  .panel {
-    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
-    padding: 24px;
-  }
-  .panel h2 {
-    font-size: 16px; font-weight: 600; color: #cbd5e1; margin-bottom: 16px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .panel h2::before {
-    content: ''; width: 4px; height: 16px; background: #38bdf8; border-radius: 2px;
-  }
-  .panel h2.rising::before { background: #fbbf24; }
-  .panel h2.top::before { background: #10b981; }
-  .panel .desc {
-    font-size: 12px; color: #94a3b8; margin-top: -10px; margin-bottom: 16px;
-  }
-  .chart-wrap { position: relative; height: 360px; }
+/* Sections */
+section{margin-top:72px}
+.section-label{font-size:13px;color:var(--accent);letter-spacing:3px;font-weight:700;
+  text-transform:uppercase;margin-bottom:10px}
+.section-title{font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-0.5px}
+.section-desc{color:var(--muted);font-size:16px;margin-bottom:28px;line-height:1.7;max-width:900px}
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #334155; }
-  th { color: #94a3b8; font-weight: 500; background: #0f172a; font-size: 11px;
-       text-transform: uppercase; letter-spacing: 0.5px; }
-  td { color: #e2e8f0; }
-  td.num { text-align: right; font-family: 'SF Mono', monospace; color: #38bdf8; }
-  tr:hover { background: #0f172a; }
-  a { color: #60a5fa; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .badge {
-    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px;
-    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .badge.actual { background: #065f46; color: #6ee7b7; }
-  .badge.est { background: #422006; color: #fbbf24; }
-  .badge.rising { background: #78350f; color: #fcd34d; }
-  .badge.veteran { background: #134e4a; color: #5eead4; }
+/* Grid */
+.grid{display:grid;gap:22px}
+.grid.g2{grid-template-columns:repeat(2,1fr)}
+.grid.g3{grid-template-columns:repeat(3,1fr)}
+.grid.g4{grid-template-columns:repeat(4,1fr)}
+.grid.gd{grid-template-columns:2fr 1fr}
+@media (max-width:960px){
+  .grid.g2,.grid.g3,.grid.g4,.grid.gd{grid-template-columns:1fr}
+  html{font-size:15px}
+  h1{font-size:30px}
+  .wrap{padding:24px 16px 60px}
+  header.hero{padding:32px 24px}
+  .section-title{font-size:24px}
+}
 
-  .keyword-card {
-    background: #1e293b; border: 1px solid #334155; border-radius: 14px;
-    padding: 22px 20px; transition: all 0.2s;
-    cursor: pointer; display: flex; flex-direction: column;
-    text-decoration: none !important; min-height: 180px;
-    position: relative; overflow: hidden;
-  }
-  .keyword-card:hover {
-    border-color: #38bdf8; background: #1e3a5f;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.15);
-  }
-  .keyword-card.oliveyoung:hover {
-    border-color: #10b981; background: #0f2e25;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
-  }
-  .keyword-card .rank-badge {
-    position: absolute; top: 14px; right: 14px;
-    font-size: 10px; font-weight: 700; color: #fbbf24;
-    background: rgba(251, 191, 36, 0.12);
-    padding: 3px 8px; border-radius: 10px;
-    letter-spacing: 0.5px;
-  }
-  .keyword-card .kw-title {
-    font-size: 17px; font-weight: 700; color: #f1f5f9;
-    line-height: 1.35; margin-bottom: 6px;
-    padding-right: 40px;
-    word-break: keep-all;
-  }
-  .keyword-card .kw-reel-count {
-    font-size: 12px; color: #94a3b8; margin-bottom: 16px;
-  }
-  .keyword-card .kw-main-stat {
-    margin-top: auto; padding-top: 12px; border-top: 1px solid #334155;
-  }
-  .keyword-card .kw-main-stat .label {
-    font-size: 10px; color: #64748b; text-transform: uppercase;
-    letter-spacing: 0.5px; margin-bottom: 4px;
-  }
-  .keyword-card .kw-main-stat .value {
-    font-size: 20px; font-weight: 700; color: #38bdf8;
-    font-family: 'SF Mono', monospace;
-  }
-  .keyword-card.oliveyoung .kw-main-stat .value { color: #10b981; }
-  .keyword-card .kw-top-user {
-    font-size: 11px; color: #94a3b8; margin-top: 6px;
-  }
-  .keyword-card .kw-top-user strong { color: #cbd5e1; font-weight: 600; }
-  .keyword-card .kw-cta {
-    position: absolute; bottom: 14px; right: 14px;
-    font-size: 10px; color: #60a5fa; opacity: 0; transition: opacity 0.2s;
-  }
-  .keyword-card:hover .kw-cta { opacity: 1; }
+/* Cards */
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:22px;
+  padding:28px;transition:all .3s ease;position:relative;overflow:hidden;
+}
+.card:hover{border-color:rgba(167,139,250,0.45)}
+.card h3{font-size:18px;margin-bottom:4px;color:#e6ebf6;font-weight:700;letter-spacing:-0.2px}
+.card .sub{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 
-  .keywords-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
-    margin-bottom: 32px;
-  }
-  @media (max-width: 1200px) { .keywords-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 768px) { .keywords-grid { grid-template-columns: repeat(2, 1fr); } }
+/* KPI – clickable */
+.kpi{cursor:pointer;user-select:none}
+.kpi .value{font-size:38px;font-weight:800;letter-spacing:-0.8px;margin:12px 0 6px;line-height:1.1}
+.kpi .unit{font-size:16px;color:var(--muted);font-weight:500;margin-left:4px}
+.kpi .delta{font-size:13px;margin-top:10px;display:inline-flex;align-items:center;gap:4px;
+  padding:6px 12px;border-radius:100px;font-weight:700}
+.kpi .delta.up{background:rgba(74,222,128,0.16);color:var(--good)}
+.kpi .delta.down{background:rgba(248,113,113,0.16);color:var(--bad)}
+.kpi .delta.neu{background:rgba(139,147,170,0.16);color:var(--muted)}
+.kpi-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.kpi-tab{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;font-weight:600;letter-spacing:0.3px;transition:all .15s}
+.kpi-tab:hover{border-color:var(--accent2);color:#fff}
+.kpi-tab.active{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0a0e1a;border-color:transparent}
+.kpi-mini{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.kpi-mini b{color:#fff;font-size:13px;display:block;margin-top:2px}
+.kpi .click-hint{position:absolute;top:14px;right:16px;font-size:10px;color:var(--accent);
+  background:rgba(110,231,255,0.1);padding:3px 8px;border-radius:100px;
+  border:1px solid rgba(110,231,255,0.25);font-weight:700;letter-spacing:0.5px}
 
-  .footer {
-    margin-top: 32px; padding-top: 16px; border-top: 1px solid #334155;
-    color: #64748b; font-size: 12px; text-align: center;
-  }
-  .footer a { color: #60a5fa; }
+/* Chart */
+.chart-wrap{position:relative;height:320px;margin-top:10px}
+.chart-wrap.tall{height:420px}
+.chart-wrap.short{height:260px}
 
-  .mini-chip {
-    display: inline-block; padding: 3px 10px; border-radius: 10px;
-    background: #0f172a; border: 1px solid #334155;
-    font-size: 11px; color: #94a3b8; margin-right: 6px; margin-top: 4px;
-  }
+/* Diagnosis */
+.diag{background:linear-gradient(135deg,rgba(248,113,113,0.1),rgba(167,139,250,0.06));
+  border-left:4px solid var(--bad);padding:20px 24px;border-radius:0 14px 14px 0;margin:14px 0}
+.diag.good{background:linear-gradient(135deg,rgba(74,222,128,0.1),rgba(110,231,255,0.06));border-left-color:var(--good)}
+.diag.warn{background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,191,36,0.04));border-left-color:var(--warn)}
+.diag strong{color:#fff;display:block;margin-bottom:6px;font-size:16px;font-weight:700}
+.diag p{font-size:15px;color:#d1d6e3;line-height:1.75}
 
-  .keyword-section { border-top: 1px solid #334155; padding: 16px 0; }
-  .keyword-section .kw-head {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-  }
-  .keyword-section .kw-link {
-    color: #f1f5f9; font-weight: 600; font-size: 15px;
-  }
-  .keyword-section .kw-link:hover { color: #38bdf8; }
+/* Links */
+a.ig-link{color:var(--accent);text-decoration:none;border-bottom:1px dashed rgba(110,231,255,0.35);transition:all .2s;font-weight:500}
+a.ig-link:hover{color:#fff;border-bottom-color:var(--accent)}
 
-  .score-pill {
-    display: inline-block; padding: 2px 7px; border-radius: 10px;
-    font-size: 10px; font-weight: 600; margin-left: 6px;
-  }
-  .score-pill.hot { background: #7f1d1d; color: #fca5a5; }
-  .score-pill.new { background: #78350f; color: #fcd34d; }
-  .multiplier { color: #fbbf24; font-family: 'SF Mono', monospace; font-weight: 600; }
+/* Ranking list */
+.rank-row{display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);gap:16px}
+.rank-row:last-child{border-bottom:none}
+.rank-num{font-size:13px;color:var(--muted);font-weight:700;min-width:32px;text-align:center}
+.rank-num.top{background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:#0a0e1a;padding:6px 10px;border-radius:8px;min-width:36px}
+.rank-body{flex:1;min-width:0}
+.rank-title{font-size:15px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.rank-val{font-size:14px;font-weight:700;color:var(--accent);white-space:nowrap;text-align:right}
+.rank-val small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:2px}
 
-  .tag-keyword {
-    display: inline-block; padding: 2px 8px; background: #312e81; color: #a5b4fc;
-    border-radius: 4px; font-size: 10px; margin-right: 4px;
-  }
+/* Progress bar */
+.bar{height:8px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;margin-top:8px}
+.bar>span{display:block;height:100%;border-radius:100px;transition:width .4s}
 
-  .empty-state {
-    padding: 40px 20px; text-align: center; color: #94a3b8;
-    background: #0f172a; border: 1px dashed #334155; border-radius: 8px;
-  }
-  .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
-  .empty-state .title { font-size: 14px; color: #cbd5e1; margin-bottom: 4px; font-weight: 600; }
-  .empty-state .sub { font-size: 12px; color: #64748b; }
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:14px 14px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;padding:10px 14px}
+tbody tr:hover{background:rgba(167,139,250,0.05)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+td .tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:6px;font-weight:700}
+.tag.good{background:rgba(74,222,128,0.2);color:var(--good)}
+.tag.bad{background:rgba(248,113,113,0.2);color:var(--bad)}
+.tag.neu{background:rgba(139,147,170,0.2);color:var(--muted)}
+.tag.warn{background:rgba(251,191,36,0.2);color:var(--warn)}
+.tag.x{background:rgba(29,155,240,0.2);color:var(--x)}
+.tag.yt{background:rgba(255,77,79,0.2);color:var(--yt)}
+.tag.ig{background:rgba(225,48,108,0.2);color:var(--ig)}
+
+/* Action plan */
+.action-item{
+  background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:20px 26px;margin-bottom:14px;display:grid;
+  grid-template-columns:44px 1fr auto;gap:20px;align-items:center;transition:all .2s;
+}
+.action-item:hover{border-color:var(--accent2)}
+.action-item .pri{
+  width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;letter-spacing:0.5px;
+}
+.pri.p1{background:linear-gradient(135deg,#f87171,#ef4444);color:#fff}
+.pri.p2{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0e1a}
+.pri.p3{background:linear-gradient(135deg,#6ee7ff,#3b82f6);color:#0a0e1a}
+.action-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:-0.2px}
+.action-desc{font-size:14px;color:#c3cadb;line-height:1.6}
+.action-owner{font-size:12px;color:var(--accent);background:rgba(110,231,255,0.1);
+  padding:6px 14px;border-radius:100px;border:1px solid rgba(110,231,255,0.2);white-space:nowrap;font-weight:600}
+
+/* Highlight */
+.hl{color:var(--accent2);font-weight:700}
+.hl2{color:var(--accent);font-weight:700}
+.hl-bad{color:var(--bad);font-weight:700}
+.hl-good{color:var(--good);font-weight:700}
+
+/* Matrix */
+.matrix{display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:10px;font-size:14px}
+.matrix>div{padding:14px 12px;border-radius:10px}
+.matrix .mhead{background:var(--panel2);color:var(--muted);font-weight:700;font-size:12px;
+  text-transform:uppercase;letter-spacing:1px;text-align:center}
+.matrix .mrow{background:var(--panel2);color:#fff;font-weight:700;display:flex;align-items:center;font-size:14px}
+.matrix .mcell{background:var(--panel);text-align:center;border:1px solid var(--border);font-weight:600}
+.mcell.win{color:var(--good);border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.05)}
+.mcell.loss{color:var(--bad);border-color:rgba(248,113,113,0.35);background:rgba(248,113,113,0.05)}
+.mcell.mid{color:var(--warn);background:rgba(251,191,36,0.04)}
+
+/* Influencer cards */
+.infl-card{background:linear-gradient(135deg,var(--panel),var(--panel2));
+  border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .2s}
+.infl-card:hover{border-color:var(--accent2)}
+.infl-header{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.infl-tier{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:800}
+.tier-hero{color:#f87171}
+.tier-power{color:#fbbf24}
+.tier-mid{color:#6ee7ff}
+.tier-nano{color:#a78bfa}
+.infl-card h4{font-size:16px;color:#fff;font-weight:700}
+.infl-card .range{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.infl-card ul{list-style:none}
+.infl-card ul li{font-size:14px;color:#c8cee0;padding:6px 0;padding-left:18px;position:relative;line-height:1.55}
+.infl-card ul li::before{content:"▸";position:absolute;left:0;color:var(--accent)}
+
+/* Reel cards with links */
+.reel-row{display:grid;grid-template-columns:40px 1fr auto auto;gap:14px;align-items:center;
+  padding:14px;border-radius:12px;margin-bottom:8px;background:var(--panel2);border:1px solid var(--border);transition:all .2s}
+.reel-row:hover{background:#1e2647;border-color:var(--accent2)}
+.reel-row .n{font-weight:800;color:var(--muted);text-align:center;font-size:14px}
+.reel-row .n.t{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0a0e1a;padding:6px;border-radius:8px}
+.reel-row .info a{color:#fff;font-weight:700;font-size:15px;text-decoration:none;display:block}
+.reel-row .info a:hover{color:var(--accent)}
+.reel-row .info .d{font-size:12px;color:var(--muted);margin-top:2px}
+.reel-row .views{font-size:15px;font-weight:800;color:var(--accent);text-align:right}
+.reel-row .views small{display:block;color:var(--muted);font-size:11px;font-weight:500}
+.reel-row .eng{font-size:13px;color:var(--good);font-weight:700;text-align:right;min-width:60px}
+.reel-row .eng.bad{color:var(--bad)}
+.reel-row .eng.mid{color:var(--warn)}
+
+/* Footer */
+footer{margin-top:80px;padding:28px;text-align:center;color:var(--muted);font-size:13px;
+  border-top:1px solid var(--border);line-height:1.7}
+footer .data-src{margin-top:10px;font-size:12px;opacity:0.8}
+footer a{color:var(--accent);text-decoration:none}
+
+/* Callout */
+.callout{background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(110,231,255,0.06));
+  border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:24px 28px;margin-top:20px}
+.callout .c-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:10px}
+.callout p{font-size:15px;color:#d1d6e3;line-height:1.75}
+
+/* Absolute vs Relative comparison */
+.abs-rel{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+.abs-rel .side{background:var(--panel2);border-radius:12px;padding:20px;border:1px solid var(--border)}
+.abs-rel .side h5{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;font-weight:700}
+.abs-rel .side .big{font-size:32px;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.1}
+.abs-rel .side .desc{font-size:13px;color:var(--muted);line-height:1.5}
+.abs-rel .side.highlight{background:linear-gradient(135deg,rgba(248,113,113,0.1),transparent);border-color:var(--bad)}
+.abs-rel .side.highlight .big{color:var(--bad)}
+
+/* Platform tag */
+.plat-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:5px;
+  font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-right:6px}
+.plat-tag.x{background:rgba(29,155,240,0.18);color:var(--x)}
+.plat-tag.yt{background:rgba(255,77,79,0.18);color:var(--yt)}
+.plat-tag.ig{background:rgba(225,48,108,0.18);color:var(--ig)}
+
+/* Leaderboard */
+.leaderboard{display:flex;flex-direction:column}
+.lb-row{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;
+  padding:13px 0;border-bottom:1px solid var(--border);}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-weight:800;font-size:14px;color:var(--muted);text-align:center}
+.lb-rank.t1{color:#fff;background:linear-gradient(135deg,#f87171,#fbbf24);border-radius:8px;padding:5px 0}
+.lb-rank.t2{color:#fff;background:linear-gradient(135deg,#fbbf24,#a78bfa);border-radius:8px;padding:5px 0}
+.lb-rank.t3{color:#0a0e1a;background:linear-gradient(135deg,#6ee7ff,#a78bfa);border-radius:8px;padding:5px 0}
+.lb-name{font-weight:700;color:#fff;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-name a{color:#fff;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2)}
+.lb-name a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.lb-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.lb-val{font-weight:800;color:var(--accent);font-size:15px;text-align:right;white-space:nowrap}
+.lb-val small{display:block;color:var(--muted);font-size:11px;font-weight:500}
+
+/* Cost efficiency cards */
+.eff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+@media (max-width:960px){.eff-grid{grid-template-columns:1fr}}
+.eff-box{background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:24px}
+.eff-box .lab{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.eff-box .num{font-size:30px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px}
+.eff-box .num.good{color:var(--good)}
+.eff-box .num.bad{color:var(--bad)}
+.eff-box .desc{font-size:13px;color:#c3cadb;line-height:1.55;margin-top:8px}
+
+/* SKU efficiency table */
+.sku-eff{margin-top:16px}
+.sku-eff th, .sku-eff td{font-size:13px}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-  <header>
-    <div>
-      <h1>🎨 뷰티 × Instagram 릴스 대시보드</h1>
-      <div class="subtitle">다이소몰 / 올리브영 뷰티 Top 10 × Instagram 릴스 트렌드 트래커</div>
-    </div>
-    <div class="timestamp">
-      마지막 업데이트: <span id="lastUpdated">-</span>
-    </div>
-  </header>
-
-  <div class="tabs">
-    <button class="tab-btn daiso active" data-tab="daiso">
-      <span class="dot daiso"></span>다이소 뷰티
-    </button>
-    <button class="tab-btn oliveyoung" data-tab="oliveyoung">
-      <span class="dot oliveyoung"></span>올리브영 뷰티
-    </button>
-    <button class="tab-btn youtube" data-tab="youtube">
-      <span class="dot youtube"></span>YouTube (올리브영)
-    </button>
-    <a class="tab-btn" href="./influencer-eval.html" style="text-decoration:none;color:inherit;">
-      <span class="dot" style="background:#fbbf24;"></span>🤝 인플루언서 검증기
-    </a>
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-meta">STRATEGIC DIAGNOSIS · 2026 Q2 · UPDATED 2026.06.16</div>
+  <h1>더랩바이블랑두 × 다이소<br>전략 방향 진단 보고서 v2</h1>
+  <p class="hero-sub">
+    2026.01~06 다이소 일별 매출 + 1,632건 모니터링(누적)(인스타·X·유튜브) +
+    경쟁사 키워드 데이터를 통합해
+    <strong style="color:#fff">"가성비 효율"·"플랫폼별 성과"·"바로 섭외할 인플루언서"</strong>까지 답을 드립니다.
+  </p>
+  <div class="badges">
+    <span class="badge">매출 62.62억원 (164일)</span>
+    <span class="badge purple">모니터링 콘텐츠 1,632건 (누적)</span>
+    <span class="badge">100K+뷰 126건</span>
+    <span class="badge purple">X·인스타·유튜브 통합 분석</span>
   </div>
-
-  <!-- 다이소 탭 -->
-  <div class="tab-content active" id="tab-daiso">
-    <div class="keywords-grid" id="daiso-keywordsGrid"></div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>키워드별 조회수 (실측+추정)</h2>
-        <div class="chart-wrap"><canvas id="daiso-keywordBar"></canvas></div>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="panel">
-        <h2 class="top">💎 영향력 Top 크리에이터</h2>
-        <div class="desc">누적 조회수 + 출현 키워드 수 + 평균 조회수 기준 상위 10명</div>
-        <div id="daiso-topInfluencers"></div>
-      </div>
-      <div class="panel">
-        <h2 class="rising">🚀 떠오르는 인플루언서</h2>
-        <div class="desc">최근 60일 내 업로드 × 바이럴 배수(조회수/좋아요) 상위. 폭발적 성장 중인 크리에이터</div>
-        <div id="daiso-risingStars"></div>
-      </div>
-    </div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>🏆 전체 바이럴 Top 10 릴스</h2>
-        <div id="daiso-viralTable"></div>
-      </div>
-    </div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>📋 키워드별 상세</h2>
-        <div id="daiso-keywordDetail"></div>
-      </div>
+  <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px">
+    <span style="background:rgba(74,222,128,0.18);color:var(--good);padding:8px 14px;border-radius:100px;border:1px solid rgba(74,222,128,0.35);font-weight:700;letter-spacing:0.3px">
+      🔄 마지막 업데이트 2026-06-16
+    </span>
+    <span style="background:rgba(110,231,255,0.14);color:var(--accent);padding:8px 14px;border-radius:100px;border:1px solid rgba(110,231,255,0.28);font-weight:700">
+      이번에 바뀐 항목 <b>18개</b>
+    </span>
+    <a href="#changelog" style="color:var(--muted);text-decoration:none;font-size:12px;border-bottom:1px dashed var(--muted);padding-bottom:1px">변경 이력 보기 ↓</a>
+  </div>
+  <div style="margin-top:18px;padding:16px 20px;background:rgba(248,113,113,0.12);border:1px solid var(--bad);border-radius:14px;">
+    <div style="font-size:12px;letter-spacing:1.5px;color:var(--bad);font-weight:800;margin-bottom:6px;">⚠ 데이터 보정 (2026-06-16)</div>
+    <div style="font-size:13.5px;color:#e6ebf6;line-height:1.6">
+      이번 사이클 두 가지를 보정했습니다. ① 매출 시트의 중복행이 정리되어 1일 1행 연속(164일)으로 정상화 — 누적 <b style="color:var(--good)">62.62억(164일)</b>이며, 전 사이클 56.72억(146일·~05-27) 대비 +5.90억은 18일치 실데이터입니다(부진·정정 아님). ② 모니터링 누적은 지난 '327건'이 read_file_content 32K토큰 절단에 따른 <b>과소집계</b>였고, 이번엔 CSV 전량(1,648행)을 파싱·URL중복제거해 정확 누적 <b style="color:#fff">1,632건</b>으로 복원했습니다(초기 추적 1,094건 궤적과 정합). 더불어 플랫폼 효율은 전량 기준 재계산해 <b>'X 바이럴 상단·IG 중앙값 안정'</b>으로 정정했습니다.
     </div>
   </div>
 
-  <!-- 올리브영 탭 -->
-  <div class="tab-content" id="tab-oliveyoung">
-    <div class="keywords-grid" id="oliveyoung-keywordsGrid"></div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>키워드별 조회수 (실측+추정)</h2>
-        <div class="chart-wrap"><canvas id="oliveyoung-keywordBar"></canvas></div>
+</header>
+
+<!-- TL;DR · 결론 제언 -->
+<section style="margin-top:28px">
+  <div style="background:linear-gradient(135deg,rgba(167,139,250,0.12) 0%,rgba(110,231,255,0.08) 100%);
+    border:1px solid rgba(167,139,250,0.3);border-radius:22px;padding:32px 36px;position:relative;overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <span style="font-size:11px;letter-spacing:3px;color:var(--accent);font-weight:800;
+        background:rgba(110,231,255,0.12);padding:6px 14px;border-radius:100px;border:1px solid rgba(110,231,255,0.3);">TL;DR · 결론 제언</span>
+      <span style="font-size:13px;color:var(--muted);">먼저 3줄로 알고 가세요</span>
+    </div>
+
+    <div style="font-size:20px;font-weight:700;line-height:1.5;color:#fff;margin-bottom:20px;letter-spacing:-0.3px">
+      <span style="color:var(--accent2)">결광 스킨핏프렙</span>을 플래그십으로 밀고,
+      <span style="color:var(--accent)">X 플랫폼·검증된 인플루언서</span>를 지렛대로 활용하세요.
+      지금 가장 비싼 실수는 <span style="color:var(--bad)">"새 사람 찾는 것"</span>입니다.
+    </div>
+
+    <div class="grid g3" style="gap:16px;margin-top:24px;">
+      <div style="background:rgba(10,14,26,0.55);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--good);font-weight:700;margin-bottom:8px;">① 가장 큰 기회</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4">결광 스킨핏프렙 플래그십화</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.6">최근 2주 <b style="color:var(--bad)">-24.8%</b> 변화. X+IG+YT 통합 시딩으로 "결광 = 전처리 공식" 각인.</div>
+      </div>
+
+      <div style="background:rgba(10,14,26,0.55);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--accent);font-weight:700;margin-bottom:8px;">② 플랫폼 우선순위</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4">X 바이럴 · IG 안정 병행</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.6">X 무가 최고 <b style="color:var(--x)">290만뷰</b>(바이럴 상단)·중앙값 909 / IG 중앙값 <b>2만</b>(안정). 전량 재집계 — 두 채널 병행.</div>
+      </div>
+
+      <div style="background:rgba(10,14,26,0.55);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--warn);font-weight:700;margin-bottom:8px;">③ 인플루언서 전략</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4">재활용 70% · 신규 30%</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.6">도로·코덕요정·ubsi·살림토끼·Nuki 등 <b>검증된 채널</b>에 결광 라인 재계약 제안 우선.</div>
       </div>
     </div>
-    <div class="grid-2">
-      <div class="panel">
-        <h2 class="top">💎 영향력 Top 크리에이터</h2>
-        <div class="desc">누적 조회수 + 출현 키워드 수 + 평균 조회수 기준 상위 10명</div>
-        <div id="oliveyoung-topInfluencers"></div>
-      </div>
-      <div class="panel">
-        <h2 class="rising">🚀 떠오르는 인플루언서</h2>
-        <div class="desc">최근 60일 내 업로드 × 바이럴 배수(조회수/좋아요) 상위. 폭발적 성장 중인 크리에이터</div>
-        <div id="oliveyoung-risingStars"></div>
+
+    <div style="margin-top:22px;padding:18px 22px;background:rgba(248,113,113,0.08);border-left:3px solid var(--bad);border-radius:0 12px 12px 0;">
+      <div style="font-size:12px;letter-spacing:1.5px;color:var(--bad);font-weight:700;margin-bottom:6px;">⚠ 리스크</div>
+      <div style="font-size:14px;color:#e6ebf6;line-height:1.65">
+        유가협업 누적 93명 중 <b style="color:#fff">검증재활용형 31명(33%)·중간형 37명(40%)·저점매수형 25명(27%)</b>으로 분포. 저점매수형 평균 <b style="color:var(--bad)">8,029뷰</b> vs 검증재활용형 평균 <b style="color:var(--good)">131,044뷰</b> — <b style="color:#fff">16배 격차</b>. 신규 계약 시 검증풀 우선 권고.
+        결광 겔마스크 <b style="color:var(--bad)">-44.9%</b>·스킨핏프렙 -24.8% 급락 — 코어 약세 원인 규명 필요.
       </div>
     </div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>🏆 전체 바이럴 Top 10 릴스</h2>
-        <div id="oliveyoung-viralTable"></div>
+
+    <div style="margin-top:18px;font-size:13px;color:var(--muted);text-align:right;font-style:italic">↓ 상세 데이터·카드 클릭으로 뷰 전환·플랫폼별 랭킹 이어집니다</div>
+  </div>
+</section>
+
+<!-- 00. EXEC SUMMARY -->
+<section>
+  <div class="section-label">Executive Summary · Click Cards to Switch View</div>
+  <div class="section-title">핵심 진단 한눈에 보기 (카드 클릭으로 뷰 전환)</div>
+  <div class="section-desc">상단 4개 카드는 클릭/버튼으로 다른 기간·관점의 데이터로 전환됩니다. 각 카드는 해당 진단을 뒷받침하는 실데이터에 직접 연결되어 있습니다.</div>
+
+  <div class="grid g4">
+    <!-- Card 1 - Sales: switch period -->
+    <div class="card kpi" id="kpi1" data-card="1">
+      <span class="click-hint">CLICK</span>
+      <h3 id="kpi1-title">누적 다이소 매출</h3>
+      <div class="sub" id="kpi1-sub">2026.01.01 ~ 2026-06-14 (164일)</div>
+      <div class="value"><span id="kpi1-val">62.62</span><span class="unit" id="kpi1-unit">억원</span></div>
+      <div class="delta neu" id="kpi1-delta">일평균 3,818만원</div>
+      <div class="kpi-tabs">
+        <button class="kpi-tab active" data-kpi="1" data-mode="cum">누적</button>
+        <button class="kpi-tab" data-kpi="1" data-mode="week">주간(7일)</button>
+        <button class="kpi-tab" data-kpi="1" data-mode="prev">전주</button>
+        <button class="kpi-tab" data-kpi="1" data-mode="day">일평균</button>
       </div>
     </div>
-    <div class="grid-1">
-      <div class="panel">
-        <h2>📋 키워드별 상세</h2>
-        <div id="oliveyoung-keywordDetail"></div>
+
+    <!-- Card 2 - Concentration: switch line -->
+    <div class="card kpi" id="kpi2" data-card="2">
+      <span class="click-hint">CLICK</span>
+      <h3 id="kpi2-title">코어 3종 매출 집중도</h3>
+      <div class="sub" id="kpi2-sub">스킨핏프렙+물광크림+부스터앰플</div>
+      <div class="value"><span id="kpi2-val">63.1</span><span class="unit" id="kpi2-unit">%</span></div>
+      <div class="delta down" id="kpi2-delta">▲ 3종 의존 과다</div>
+      <div class="kpi-tabs">
+        <button class="kpi-tab active" data-kpi="2" data-mode="core">코어3종</button>
+        <button class="kpi-tab" data-kpi="2" data-mode="mulgwang">물광라인</button>
+        <button class="kpi-tab" data-kpi="2" data-mode="gyeol">결광라인</button>
+        <button class="kpi-tab" data-kpi="2" data-mode="homme">옴므라인</button>
+      </div>
+    </div>
+
+    <!-- Card 3 - Recent SKU trend: switch SKU -->
+    <div class="card kpi" id="kpi3" data-card="3">
+      <span class="click-hint">CLICK</span>
+      <h3 id="kpi3-title">최근 14일 옴므선크림 (가속 1위)</h3>
+      <div class="sub" id="kpi3-sub">최근14일 vs 직전14일 · 가속 SKU 3종</div>
+      <div class="value" style="color:var(--good)"><span id="kpi3-val">+19.3</span><span class="unit" id="kpi3-unit">%</span></div>
+      <div class="delta neu" id="kpi3-delta">옴므선크림 가속</div>
+      <div class="kpi-tabs">
+        <button class="kpi-tab active" data-kpi="3" data-mode="g1">1위</button>
+        <button class="kpi-tab" data-kpi="3" data-mode="g2">2위</button>
+        <button class="kpi-tab" data-kpi="3" data-mode="g3">3위</button>
+        <button class="kpi-tab" data-kpi="3" data-mode="core">코어3종</button>
+      </div>
+    </div>
+
+    <!-- Card 4 - SNS exposure: switch platform -->
+    <div class="card kpi" id="kpi4" data-card="4">
+      <span class="click-hint">CLICK</span>
+      <h3 id="kpi4-title">SNS 모니터링 — 누적</h3>
+      <div class="sub" id="kpi4-sub">1,632건 누적 · 10만뷰+ 126건</div>
+      <div class="value"><span id="kpi4-val">5,319</span><span class="unit" id="kpi4-unit">만 뷰</span></div>
+      <div class="delta neu" id="kpi4-delta">평균 32,589 뷰/건</div>
+      <div class="kpi-tabs">
+        <button class="kpi-tab active" data-kpi="4" data-mode="all">전체</button>
+        <button class="kpi-tab" data-kpi="4" data-mode="x">X(트위터)</button>
+        <button class="kpi-tab" data-kpi="4" data-mode="ig">인스타</button>
+        <button class="kpi-tab" data-kpi="4" data-mode="yt">유튜브</button>
       </div>
     </div>
   </div>
 
-  <!-- YouTube 탭 -->
-  <div class="tab-content" id="tab-youtube">
-    <div class="yt-iframe-wrap">
-      <iframe src="./youtube/oliveyoung.html" title="올리브영 YouTube Top 10 대시보드" loading="lazy"></iframe>
+  <div style="margin-top:24px">
+    <div class="diag good">
+      <strong>🟢 진단 1. 무가시딩이 유가협업보다 CPM 19배 효율적</strong>
+      <p>416건의 무가시딩이 1,200만 뷰를 만들었고(예상비용 1,248만원, CPM 1,040원),
+      유가협업 122건은 932만 뷰(예상비용 1억 8,300만원, CPM 19,638원). <span class="hl-good">즉, 무가시딩 1원 = 유가협업 19원의 노출 효과</span>.
+      문제는 무가시딩 성공률이 28%(1만뷰+)·8%(10만뷰+)에 불과하다는 것. <strong style="color:#fff">선별만 잘하면 압도적</strong>입니다.</p>
+    </div>
+    <div class="diag warn">
+      <strong>🟡 진단 2. X(트위터)가 우리의 숨겨진 1등 채널</strong>
+      <p>X는 무가시딩 평균 47,895 뷰로 인스타(15,536)의 <span class="hl">3.1배</span>. 도로(@dorotice5) 한 명이 무가시딩 3건으로 <span class="hl-good">516만 뷰</span> 달성.
+      그런데도 우리 마케팅은 인스타에 집중. X 전용 시딩 트랙을 분리해 강화해야 합니다.</p>
+    </div>
+    <div class="diag">
+      <strong>🔴 진단 3. 라인별로 무가/유가 효율이 정반대 — 일률 적용 금지</strong>
+      <p>CH 퍼펙트(결광)는 무가 평균 82,665 vs 유가 78,663 — <span class="hl-good">무가가 더 효율</span>.
+      OH 라인은 무가 15,532 vs 유가 74,720 — <span class="hl-bad">유가가 4.8배 효율</span>.
+      PB·히알샤워 OH는 무가시딩이 사실상 무용지물(평균 547·952 뷰).
+      <strong style="color:#fff">라인별로 채널·노출타입을 다르게 가져가야 합니다.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- 01. SALES DASHBOARD -->
+<section>
+  <div class="section-label">Part 1 · Sales Diagnostic</div>
+  <div class="section-title">다이소 매출 현황 · 최근 흐름 중심</div>
+  <div class="section-desc">"지금 이 순간 무엇이 움직이고 있는가"에 초점</div>
+
+  <div class="card" style="margin-bottom:22px">
+    <h3>먼저 "선택과 집중"부터 — 라인별 절대 금액 vs 성장률</h3>
+    <div class="sub">% 성장만 보면 옴므가 대박처럼 보이지만, 절대 금액은 전체의 6.6%에 불과</div>
+    <div class="abs-rel">
+      <div class="side">
+        <h5>누적 매출 (절대 금액)</h5>
+        <div class="big">물광 28.84억 · 결광 20.65억 · <span style="opacity:0.6">옴므 3.69억</span></div>
+        <div class="desc">물광 54% + 결광 39% = 전체의 93%. 옴므는 6.9%로 "성장률 높아도 파이 자체가 작음"</div>
+      </div>
+      <div class="side highlight">
+        <h5>1월 대비 4월 성장률 (착시 주의)</h5>
+        <div class="big">옴므 선크림 +62.6%</div>
+        <div class="desc">증가분 일 +20만원 vs 결광 스킨핏프렙 +34.7% = 일 +223만원 (<strong style="color:#fff">11배 임팩트</strong>)</div>
+      </div>
     </div>
   </div>
 
-  <div class="footer">
-    📂 <a href="https://drive.google.com/drive/folders/1K-zw4XcTiR_Ii-nHea1GODUX4x3QxdOh" target="_blank">Google Drive 폴더 열기</a> ·
-    자동 업데이트: 다이소 평일 11:59 · 올리브영 평일 14:59 · Generated by Claude Agent
+  <div class="grid g2" style="margin-bottom:22px">
+    <div class="card">
+      <h3>주차별 라인 매출 추이 (만원)</h3>
+      <div class="sub">W01 ~ W20 · 최신 W20 (5/11~5/17) 반영</div>
+      <div class="chart-wrap"><canvas id="weeklyLineChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>주차별 핵심 SKU 추이 (만원)</h3>
+      <div class="sub">상위 5 SKU 시계열 변화</div>
+      <div class="chart-wrap"><canvas id="weeklySkuChart"></canvas></div>
+    </div>
   </div>
 
-</div>
+  <div class="card" style="margin-bottom:22px">
+    <h3>지금 주목해야 할 최근 2주 변화 (W17+W18 vs W15+W16)</h3>
+    <div class="sub">4월 말~5월 초 — 의사결정에 가장 중요한 트렌드</div>
+    <div class="chart-wrap"><canvas id="recentChart"></canvas></div>
+  </div>
 
-<script>
-// ====== 다이소 데이터 (daiso-beauty-instagram-weekly 스케줄이 이 블록을 교체) ======
-// DAISO_DATA_BEGIN
+  <div class="callout">
+    <div class="c-title">📌 Part 1 결론: "결광 스킨핏프렙 플래그십화 + 물광 3종 방어"</div>
+    <p>결광 스킨핏프렙(변화 -9.3%)과 물광 크림+부스터+틴티드(반등 +3.1~+8.1%)에 집중. 옴므는 비용 최소화 유지, 결광 세럼미스트(+3.5%)는 추세 모니터링.</p>
+  </div>
+</section>
 
+<!-- 02. COST EFFICIENCY (NEW) -->
+<section>
+  <div class="section-label">Part 2 · Cost Efficiency · NEW</div>
+  <div class="section-title">가성비 효율 분석 — 무가시딩 vs 유가협업</div>
+  <div class="section-desc">1,094건 모니터링 데이터(노출 타입 8종)로 계산한 실제 CPM(1,000뷰당 비용)과 SKU별 효율</div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const daisoData = {
-  "lastUpdated": "2026-06-15T11:30",
-  "top10": [
-    {
-      "rank": 1,
-      "pdNo": "1067495",
-      "name": "[퀵수분충전]VT PDRN 광채 토너 200 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "7,771",
-      "buy_count": "1.8만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20250929/thumb/300/ne9YHnao1D592hc9xmCp1067495_00_01ne9YHnao1D592hc9xmCp.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1067495",
-      "brand": "VT"
-    },
-    {
-      "rank": 2,
-      "pdNo": "1061918",
-      "name": "본셉 비타씨 동결 건조 더블샷 앰플 키트",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "9,999+",
-      "buy_count": "27만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20251216/thumb/300/lcOc1IVBETy66kefZV8g1061918_00_00lcOc1IVBETy66kefZV8g.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1061918",
-      "brand": "본셉"
-    },
-    {
-      "rank": 3,
-      "pdNo": "1044553",
-      "name": "마데카21 테카 솔루션 수딩 미스트 토너 200 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "9,999+",
-      "buy_count": "18만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20260402/thumb/300/YAGyPq2hshglHl0qRLSj1044553_00_00YAGyPq2hshglHl0qRLSj.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1044553",
-      "brand": "마데카21"
-    },
-    {
-      "rank": 4,
-      "pdNo": "1067499",
-      "name": "[수분충전]VT PDRN 광채 시트 마스크 1매 25 g",
-      "price": 1000,
-      "rating": "4.8",
-      "review_count": "4,467",
-      "buy_count": "15만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20250929/thumb/300/VaaKV3bgiDTNm72FbhfR1067499_00_01VaaKV3bgiDTNm72FbhfR.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1067499",
-      "brand": "VT"
-    },
-    {
-      "rank": 5,
-      "pdNo": "1055168",
-      "name": "본셉 레티놀 2500 IU 링클샷 퍼펙터 15 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "7,776",
-      "buy_count": "16만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20251218/thumb/300/d8NqIeDpOKYbm6p44Fzf1055168_00_00d8NqIeDpOKYbm6p44Fzf.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1055168",
-      "brand": "본셉"
-    },
-    {
-      "rank": 6,
-      "pdNo": "1075033",
-      "name": "마미케어 바다포도 모공세럼 30 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "1,095",
-      "buy_count": "",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20251215/thumb/300/LKHKkUiBLe3vgJEfmKJt1075033_00_01LKHKkUiBLe3vgJEfmKJt.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1075033",
-      "brand": "마미케어"
-    },
-    {
-      "rank": 7,
-      "pdNo": "1055374",
-      "name": "더마블록 마일드 선스틱 16 g (by 셀퓨전씨)",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "2,115",
-      "buy_count": "2.7만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20240510/thumb/300/wTSEmHZQH0IdkA4Xfwv31055374_00_00wTSEmHZQH0IdkA4Xfwv3.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1055374",
-      "brand": "더마블록"
-    },
-    {
-      "rank": 8,
-      "pdNo": "1060644",
-      "name": "더랩 바이 블랑두 클리어 히알 물광 부스터 앰플 30 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "4,780",
-      "buy_count": "5.8만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20251231/thumb/300/wfPC4Z9JWor0Iq7HY3ZD1060644_00_00wfPC4Z9JWor0Iq7HY3ZD.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1060644",
-      "brand": "블랑두"
-    },
-    {
-      "rank": 9,
-      "pdNo": "1044554",
-      "name": "마데카21 테카 솔루션 수딩 크림 50 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "6,440",
-      "buy_count": "12만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20260402/thumb/300/zs4IuvvzXTUWWtsmvRi61044554_00_00zs4IuvvzXTUWWtsmvRi6.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1044554",
-      "brand": "마데카21"
-    },
-    {
-      "rank": 10,
-      "pdNo": "1061529",
-      "name": "바이 리얼베리어 세라베이스 카밍 모이스처라이징 크림 50 ml",
-      "price": 5000,
-      "rating": "4.8",
-      "review_count": "4,235",
-      "buy_count": "3만+",
-      "image_url": "https://cdn.daisomall.co.kr/file/resize/PD/20251231/thumb/300/FxVMJqI3Yb0oYpaik6KC1061529_00_00FxVMJqI3Yb0oYpaik6KC.jpg",
-      "url": "https://www.daisomall.co.kr/ds/pd/pd?pdNo=1061529",
-      "brand": "리얼베리어"
-    }
-  ],
-  "keywords": [
-    {
-      "rank": 0,
-      "keyword": "다이소 뷰티 일반",
-      "reelCount": 5,
-      "totalViews": 2593792,
-      "totalEngagement": 20434,
-      "topReels": [
-        {
-          "brand": "다이소",
-          "keyword": "다이소 뷰티 일반",
-          "id": "DZhnBkOqb2f",
-          "url": "https://www.instagram.com/p/DZhnBkOqb2f/",
-          "user": "1m_selfskin",
-          "date": "2026-06-13",
-          "likes": 8873,
-          "comments": 53,
-          "engagement": 8926,
-          "views": 1135744,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 뷰티 일반",
-          "id": "DZZz0dPJuig",
-          "url": "https://www.instagram.com/p/DZZz0dPJuig/",
-          "user": "imeow.ing",
-          "date": "2026-06-10",
-          "likes": 8259,
-          "comments": 105,
-          "engagement": 8364,
-          "views": 1057152,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 뷰티 일반",
-          "id": "DZkKogFp0P0",
-          "url": "https://www.instagram.com/p/DZkKogFp0P0/",
-          "user": "sallim_rabbit",
-          "date": "2026-06-14",
-          "likes": 3012,
-          "comments": 11,
-          "engagement": 3023,
-          "views": 385536,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 뷰티 일반",
-          "id": "DZg9-0tRRmp",
-          "url": "https://www.instagram.com/p/DZg9-0tRRmp/",
-          "user": "ha____dobby",
-          "date": "2026-06-13",
-          "likes": 117,
-          "comments": 1,
-          "engagement": 118,
-          "views": 14976,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 뷰티 일반",
-          "id": "DZeUEvckZM3",
-          "url": "https://www.instagram.com/p/DZeUEvckZM3/",
-          "user": "un_zippp",
-          "date": "2026-06-12",
-          "likes": 3,
-          "comments": 0,
-          "engagement": 3,
-          "views": 384,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 1,
-      "keyword": "다이소 VT PDRN",
-      "reelCount": 3,
-      "totalViews": 318336,
-      "totalEngagement": 2500,
-      "topReels": [
-        {
-          "brand": "다이소",
-          "keyword": "다이소 VT PDRN",
-          "id": "DYmO-CuT2dv",
-          "url": "https://www.instagram.com/p/DYmO-CuT2dv/",
-          "user": "eunhalu_",
-          "date": "2026-05-21",
-          "likes": 1975,
-          "comments": 1,
-          "engagement": 1976,
-          "views": 252800,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 VT PDRN",
-          "id": "DYZTbnnx1N8",
-          "url": "https://www.instagram.com/p/DYZTbnnx1N8/",
-          "user": "tjdxdx_",
-          "date": "2026-05-16",
-          "likes": 422,
-          "comments": 9,
-          "engagement": 431,
-          "views": 54016,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "다이소",
-          "keyword": "다이소 VT PDRN",
-          "id": "DZhdP7fzg2t",
-          "url": "https://www.instagram.com/p/DZhdP7fzg2t/",
-          "user": "cheek_kitty",
-          "date": "2026-06-13",
-          "likes": 90,
-          "comments": 3,
-          "engagement": 93,
-          "views": 11520,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 2,
-      "keyword": "다이소 본셉",
-      "reelCount": 1,
-      "totalViews": 131200,
-      "totalEngagement": 1036,
-      "topReels": [
-        {
-          "brand": "다이소",
-          "keyword": "다이소 본셉",
-          "id": "DYzJUT9p_E9",
-          "url": "https://www.instagram.com/p/DYzJUT9p_E9/",
-          "user": "kongsutumsu",
-          "date": "2026-05-26",
-          "likes": 1025,
-          "comments": 11,
-          "engagement": 1036,
-          "views": 131200,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 6,
-      "keyword": "다이소 마미케어",
-      "reelCount": 1,
-      "totalViews": 219264,
-      "totalEngagement": 1786,
-      "topReels": [
-        {
-          "brand": "다이소",
-          "keyword": "다이소 마미케어",
-          "id": "DZhbNMvy-aL",
-          "url": "https://www.instagram.com/p/DZhbNMvy-aL/",
-          "user": "codckujin.22",
-          "date": "2026-06-13",
-          "likes": 1713,
-          "comments": 73,
-          "engagement": 1786,
-          "views": 219264,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    }
-  ]
-};
-// DAISO_DATA_END
-
-// ====== 올리브영 데이터 (oliveyoung-beauty-instagram-weekly 스케줄이 이 블록을 교체) ======
-// OLIVEYOUNG_DATA_BEGIN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const oliveyoungData = {
-  "lastUpdated": "2026-06-15T11:30",
-  "top10": [
-    {
-      "rank": 1,
-      "goodsNo": "A000000255324",
-      "name": "[6월 올영픽/한정기획] 아누아 피디알엔 히알루론산 캡슐 100 세럼 30ml 더블기획 (+피디알엔 마스크 1매)",
-      "brand": "아누아",
-      "price": 57500,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025532408ko.png",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255324"
-    },
-    {
-      "rank": 2,
-      "goodsNo": "A000000223414",
-      "name": "[6월 올영픽/15년 연속 1위] 메디힐 에센셜 마스크팩 10/10+1매 기획 7종 골라담기",
-      "brand": "메디힐",
-      "price": 20000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0022/A000000223414114ko.jpg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223414"
-    },
-    {
-      "rank": 3,
-      "goodsNo": "A000000255124",
-      "name": "[6월올영픽/1+1] 라운드랩 자작나무 수분 선크림 50ml 1+1 기획 (+여행용 20ml)",
-      "brand": "라운드랩",
-      "price": 25000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025512413ko.jpg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255124"
-    },
-    {
-      "rank": 4,
-      "goodsNo": "A000000171423",
-      "name": "[6월 올영픽/4년 연속 1위] 어노브 딥 데미지 리페어 헤어 마스크 (트리트먼트/헤어팩) 320ml 더블/듀오 기획",
-      "brand": "어노브",
-      "price": 42000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0017/A000000171423148ko.png",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000171423"
-    },
-    {
-      "rank": 5,
-      "goodsNo": "A000000255385",
-      "name": "[6월 올영픽/한정기획] 메디힐 더마 토너패드 200매 대용량 7종 기획 골라담기 (+휴대용 케이스)",
-      "brand": "메디힐",
-      "price": 39900,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A000000255385227ko.png",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255385"
-    },
-    {
-      "rank": 6,
-      "goodsNo": "A000000255125",
-      "name": "[6월 올영픽/1+1] 라운드랩 자작나무 수분 톤업 선크림 50ml 1+1 기획 (+여행용 20ml)",
-      "brand": "라운드랩",
-      "price": 25000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025512514ko.jpg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255125"
-    },
-    {
-      "rank": 7,
-      "goodsNo": "A000000255682",
-      "name": "[6월올영픽/1등모공패드]메디큐브 제로 모공 패드 140매 한교동 리필기획 (본품 70매+리필70매)",
-      "brand": "메디큐브",
-      "price": 33000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025568236ko.jpeg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255682"
-    },
-    {
-      "rank": 8,
-      "goodsNo": "A000000244783",
-      "name": "바닐라코 클린잇제로 포어클렌징밤 100ml 더블기획 (+리무버 100ml)",
-      "brand": "바닐라코",
-      "price": 40000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0024/A00000024478362ko.jpg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000244783"
-    },
-    {
-      "rank": 9,
-      "goodsNo": "A000000255740",
-      "name": "나르카 프레시 세범 헤어 마스카라 / 세범 미스트 중 택 1",
-      "brand": "나르카",
-      "price": 19200,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0025/A00000025574024ko.png",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255740"
-    },
-    {
-      "rank": 10,
-      "goodsNo": "A000000219553",
-      "name": "구달 맑은 어성초 진정 수분 선크림 50ml 1+1 기획 (+피규어 1종)",
-      "brand": "구달",
-      "price": 22000,
-      "image_url": "https://image.oliveyoung.co.kr/cfimages/cf-goods/uploads/images/thumbnails/400/10/0000/0021/A00000021955348ko.jpg",
-      "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219553"
-    }
-  ],
-  "keywords": [
-    {
-      "rank": 0,
-      "keyword": "올리브영 일반",
-      "reelCount": 3,
-      "totalViews": 1379328,
-      "totalEngagement": 10803,
-      "topReels": [
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 일반",
-          "id": "DZACeZxg5-o",
-          "url": "https://www.instagram.com/p/DZACeZxg5-o/",
-          "user": "review_mingming",
-          "date": "2026-05-31",
-          "likes": 8983,
-          "comments": 19,
-          "engagement": 9002,
-          "views": 1149824,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 일반",
-          "id": "DY6qAVpDlhg",
-          "url": "https://www.instagram.com/p/DY6qAVpDlhg/",
-          "user": "lime.now",
-          "date": "2026-05-29",
-          "likes": 1404,
-          "comments": 7,
-          "engagement": 1411,
-          "views": 179712,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 일반",
-          "id": "DZMwMmcxj3Y",
-          "url": "https://www.instagram.com/p/DZMwMmcxj3Y/",
-          "user": "thingthing.kr",
-          "date": "2026-06-05",
-          "likes": 389,
-          "comments": 1,
-          "engagement": 390,
-          "views": 49792,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 1,
-      "keyword": "올리브영 메디힐",
-      "reelCount": 3,
-      "totalViews": 27824640,
-      "totalEngagement": 218149,
-      "topReels": [
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디힐",
-          "id": "DY9VfPbPfbI",
-          "url": "https://www.instagram.com/p/DY9VfPbPfbI/",
-          "user": "mkt_pedia",
-          "date": "2026-05-30",
-          "likes": 217328,
-          "comments": 767,
-          "engagement": 218095,
-          "views": 27817984,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디힐",
-          "id": "DZkDVcETHTA",
-          "url": "https://www.instagram.com/p/DZkDVcETHTA/",
-          "user": "being_eunji",
-          "date": "2026-06-14",
-          "likes": 26,
-          "comments": 2,
-          "engagement": 28,
-          "views": 3328,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디힐",
-          "id": "DZaN2_zxdKh",
-          "url": "https://www.instagram.com/p/DZaN2_zxdKh/",
-          "user": "gaeeeeurii",
-          "date": "2026-06-10",
-          "likes": 26,
-          "comments": 0,
-          "engagement": 26,
-          "views": 3328,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 3,
-      "keyword": "라운드랩 선크림",
-      "reelCount": 2,
-      "totalViews": 231040,
-      "totalEngagement": 1878,
-      "topReels": [
-        {
-          "brand": "올리브영",
-          "keyword": "라운드랩 선크림",
-          "id": "DZkLYLZN-74",
-          "url": "https://www.instagram.com/p/DZkLYLZN-74/",
-          "user": "byori_yaksa",
-          "date": "2026-06-15",
-          "likes": 1724,
-          "comments": 69,
-          "engagement": 1793,
-          "views": 220672,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "라운드랩 선크림",
-          "id": "DZmfA8qTw6v",
-          "url": "https://www.instagram.com/p/DZmfA8qTw6v/",
-          "user": "good.yaksa",
-          "date": "2026-06-15",
-          "likes": 81,
-          "comments": 4,
-          "engagement": 85,
-          "views": 10368,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 4,
-      "keyword": "올리브영 어노브",
-      "reelCount": 2,
-      "totalViews": 155008,
-      "totalEngagement": 1336,
-      "topReels": [
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 어노브",
-          "id": "DY4FtcKRmo8",
-          "url": "https://www.instagram.com/p/DY4FtcKRmo8/",
-          "user": "its_x_yeseo",
-          "date": "2026-05-28",
-          "likes": 816,
-          "comments": 110,
-          "engagement": 926,
-          "views": 104448,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 어노브",
-          "id": "DY32KTpPDri",
-          "url": "https://www.instagram.com/p/DY32KTpPDri/",
-          "user": "hwitto_",
-          "date": "2026-05-28",
-          "likes": 395,
-          "comments": 15,
-          "engagement": 410,
-          "views": 50560,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    },
-    {
-      "rank": 7,
-      "keyword": "올리브영 메디큐브",
-      "reelCount": 3,
-      "totalViews": 3961984,
-      "totalEngagement": 31224,
-      "topReels": [
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디큐브",
-          "id": "DZAYGxcxq1x",
-          "url": "https://www.instagram.com/p/DZAYGxcxq1x/",
-          "user": "somqip",
-          "date": "2026-05-31",
-          "likes": 26720,
-          "comments": 251,
-          "engagement": 26971,
-          "views": 3420160,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디큐브",
-          "id": "DZHmfflzfhE",
-          "url": "https://www.instagram.com/p/DZHmfflzfhE/",
-          "user": "ei_jyojyo23",
-          "date": "2026-06-03",
-          "likes": 3820,
-          "comments": 17,
-          "engagement": 3837,
-          "views": 488960,
-          "type": "추정 (likes×128)"
-        },
-        {
-          "brand": "올리브영",
-          "keyword": "올리브영 메디큐브",
-          "id": "DZCT6CYBwX8",
-          "url": "https://www.instagram.com/p/DZCT6CYBwX8/",
-          "user": "yuly_ummy",
-          "date": "2026-06-01",
-          "likes": 413,
-          "comments": 3,
-          "engagement": 416,
-          "views": 52864,
-          "type": "추정 (likes×128)"
-        }
-      ]
-    }
-  ]
-};
-// OLIVEYOUNG_DATA_END
-
-// =========================================================
-
-const palette = ['#38bdf8', '#a78bfa', '#f472b6', '#fb923c', '#34d399', '#facc15', '#f87171', '#22d3ee', '#c084fc', '#fbbf24'];
-const oliveyoungPalette = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#22d3ee', '#38bdf8', '#60a5fa', '#a78bfa', '#f472b6', '#fbbf24'];
-
-function fmt(n) {
-  if (!n && n !== 0) return '-';
-  if (n >= 10000) return (n / 10000).toFixed(1) + '만';
-  if (n >= 1000) return n.toLocaleString();
-  return String(n);
-}
-function fmtX(n) {
-  if (!n && n !== 0) return '-';
-  if (n >= 100) return Math.round(n) + '배';
-  return n.toFixed(1) + '배';
-}
-function daysSince(dateStr, refDate) {
-  return Math.round((new Date(refDate) - new Date(dateStr)) / (1000*60*60*24));
-}
-
-function kwSearchUrl(kw) {
-  return 'https://www.instagram.com/explore/search/keyword/?q=' + encodeURIComponent(kw);
-}
-
-function renderKeywordCards(d, prefix, isOliveyoung) {
-  const cardClass = isOliveyoung ? 'keyword-card oliveyoung' : 'keyword-card';
-  document.getElementById(prefix + '-keywordsGrid').innerHTML = d.keywords.map(k => `
-    <a class="${cardClass}" href="${kwSearchUrl(k.keyword)}" target="_blank" title="Instagram에서 '${k.keyword}' 검색">
-      <div class="rank-badge">#${k.rank}</div>
-      <div class="kw-title">${k.keyword}</div>
-      <div class="kw-reel-count">${k.reelCount > 0 ? k.reelCount + '개 릴스 수집' : '수집 대기 중'}</div>
-      <div class="kw-main-stat">
-        <div class="label">총 조회수 (추정) / 인게이지먼트 (실측)</div>
-        <div class="value">${k.totalViews > 0 ? fmt(k.totalViews) : '-'}<span style="color:#34d399;font-size:0.7em;font-weight:normal;"> · ${k.totalEngagement != null && k.totalEngagement > 0 ? fmt(k.totalEngagement) : '-'}</span></div>
-        <div class="kw-top-user">${k.topReels[0] ? 'Top <strong>@' + k.topReels[0].user + '</strong>' : '<span style="color:#64748b;">첫 실행 대기</span>'}</div>
+  <div class="card">
+    <h3>💰 노출 타입별 가성비 한눈에 보기</h3>
+    <div class="sub">예상비용 가정: 무가시딩 1건 = 3만원(샘플+물류) · 유가협업 1건 = 평균 150만원 · 오가닉 = 0원</div>
+    <div class="eff-grid">
+      <div class="eff-box">
+        <div class="lab">무가시딩</div>
+        <div class="num good">CPM 1,040원</div>
+        <div class="desc">416건 · 총 1,200만 뷰 · 예상비용 1,248만원<br>1만뷰+ 성공률 <strong style="color:#fff">28%</strong>, 10만뷰+ 대박률 <strong style="color:#fff">8%</strong></div>
       </div>
-      <div class="kw-cta">Instagram 검색 ↗</div>
-    </a>
-  `).join('');
-}
+      <div class="eff-box">
+        <div class="lab">유가협업</div>
+        <div class="num bad">CPM 19,639원</div>
+        <div class="desc">122건 · 총 932만 뷰 · 예상비용 1억 8,300만원<br>1건당 안정적이지만 <strong style="color:#fff">CPM 19배 비쌈</strong></div>
+      </div>
+      <div class="eff-box">
+        <div class="lab">오가닉</div>
+        <div class="num good">CPM 0원 (무료)</div>
+        <div class="desc">307건 · 총 1,264만 뷰 · 비용 0원<br>씨앗(시딩·바이럴) 뿌려놓고 자라는 콘텐츠 — <strong style="color:#fff">투자 대비 무한대 수익</strong></div>
+      </div>
+    </div>
+  </div>
 
-function renderKeywordBar(d, canvasId, paletteColors) {
-  const hasData = d.keywords.some(k => k.totalViews > 0);
-  if (!hasData) {
-    const ctx = document.getElementById(canvasId);
-    const parent = ctx.parentElement;
-    parent.innerHTML = '<div class="empty-state"><div class="icon">📊</div><div class="title">아직 수집된 데이터가 없습니다</div><div class="sub">첫 스케줄 실행 후 차트가 표시됩니다</div></div>';
-    return;
-  }
-  new Chart(document.getElementById(canvasId), {
-    type: 'bar',
-    data: {
-      labels: d.keywords.map(k => k.keyword.length > 14 ? k.keyword.slice(0,14)+'…' : k.keyword),
-      datasets: [{
-        label: '총 조회수',
-        data: d.keywords.map(k => k.totalViews),
-        backgroundColor: paletteColors.map(c => c + 'CC'),
-        borderColor: paletteColors, borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#94a3b8', callback: v => fmt(v) }, grid: { color: '#334155' } },
-        y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } }
-      }
-    }
-  });
-}
-
-function aggregateCreators(d) {
-  const map = {};
-  d.keywords.forEach(k => k.topReels.forEach(r => {
-    if (!map[r.user]) {
-      map[r.user] = {
-        user: r.user, reels: [], keywords: new Set(),
-        totalViews: 0, totalLikes: 0
-      };
-    }
-    const m = map[r.user];
-    m.reels.push({...r, keyword: k.keyword});
-    m.keywords.add(k.keyword);
-    m.totalViews += r.views || 0;
-    m.totalLikes += r.likes || 0;
-  }));
-  return Object.values(map).map(m => ({
-    ...m,
-    keywordList: Array.from(m.keywords),
-    keywordCount: m.keywords.size,
-    avgViews: m.totalViews / m.reels.length,
-    viralMultiplier: m.totalLikes > 0 ? m.totalViews / m.totalLikes : 0,
-    mostRecentDays: Math.min(...m.reels.map(r => daysSince(r.date, d.lastUpdated))),
-    mostRecentReel: m.reels.reduce((a,b) => daysSince(a.date, d.lastUpdated) < daysSince(b.date, d.lastUpdated) ? a : b)
-  }));
-}
-
-function renderTopInfluencers(d, containerId) {
-  const creators = aggregateCreators(d);
-  if (creators.length === 0) {
-    document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="icon">💎</div><div class="title">영향력 랭킹 준비 중</div><div class="sub">첫 데이터 수집 후 표시됩니다</div></div>';
-    return;
-  }
-  const sorted = creators.sort((a,b) => {
-    const scoreA = a.totalViews * (1 + a.keywordCount * 0.2);
-    const scoreB = b.totalViews * (1 + b.keywordCount * 0.2);
-    return scoreB - scoreA;
-  }).slice(0, 10);
-
-  document.getElementById(containerId).innerHTML = `
-    <table>
+  <!-- Line × Type matrix -->
+  <div class="card" style="margin-top:22px">
+    <h3>📊 라인별 무가 vs 유가 효율 매트릭스 — "라인마다 답이 다르다"</h3>
+    <div class="sub">평균 조회수 기준 · 짙은 색일수록 효율적 · 라인별 채널 전략 차별화 근거</div>
+    <table class="sku-eff" style="margin-top:14px">
       <thead><tr>
-        <th>#</th><th>크리에이터</th><th class="num">총 조회</th>
-        <th class="num">릴스</th><th class="num">키워드</th><th>카테고리</th>
+        <th>라인 (관련 SKU)</th>
+        <th class="num">무가시딩 평균뷰</th>
+        <th class="num">오가닉 평균뷰</th>
+        <th class="num">유가협업 평균뷰</th>
+        <th>가장 효율적인 노출타입</th>
       </tr></thead>
       <tbody>
-        ${sorted.map((c,i) => `
-          <tr>
-            <td><strong>${i+1}</strong></td>
-            <td><a href="https://www.instagram.com/${c.user}/" target="_blank">@${c.user}</a>
-              ${c.keywordCount >= 2 ? '<span class="score-pill hot">다회출현</span>' : ''}
-            </td>
-            <td class="num">${fmt(c.totalViews)}</td>
-            <td class="num">${c.reels.length}</td>
-            <td class="num">${c.keywordCount}</td>
-            <td>${c.keywordList.slice(0,2).map(k => `<span class="tag-keyword">${k.length > 10 ? k.slice(0,10)+'…' : k}</span>`).join('')}${c.keywordList.length>2 ? `+${c.keywordList.length-2}` : ''}</td>
-          </tr>
-        `).join('')}
+        <tr><td><b>CH 퍼펙트</b> <span class="tag good">결광</span><br><small style="color:var(--muted)">스킨핏프렙·세럼미스트·선에센스</small></td>
+          <td class="num" style="color:var(--good)">82,665</td>
+          <td class="num">48,245</td>
+          <td class="num">78,663</td>
+          <td><span class="tag good">무가시딩 ★</span> 유가보다도 효율 높음</td></tr>
+        <tr><td><b>CH 듀이</b> <span class="tag good">물광</span><br><small style="color:var(--muted)">물광 크림·앰플·틴티드</small></td>
+          <td class="num">24,217</td>
+          <td class="num" style="color:var(--good)">58,642</td>
+          <td class="num">37,244</td>
+          <td><span class="tag good">오가닉 ★</span> 자생력 강함, 시딩 효율 낮음</td></tr>
+        <tr><td><b>OH</b> <span class="tag neu">제품라인</span><br><small style="color:var(--muted)">딥토너·딥글로우세럼·패드·크림쿠션</small></td>
+          <td class="num" style="color:var(--bad)">15,532</td>
+          <td class="num">25,633</td>
+          <td class="num" style="color:var(--good)">74,720</td>
+          <td><span class="tag warn">유가협업 ★</span> 무가시딩 효율 1/5</td></tr>
+        <tr><td><b>CH 옴므</b> <span class="tag warn">옴므</span></td>
+          <td class="num" style="color:var(--bad)">0</td>
+          <td class="num" style="color:var(--bad)">5,309</td>
+          <td class="num" style="color:var(--good)">106,990</td>
+          <td><span class="tag bad">유가만 의미</span> 무가는 4건 전부 0뷰</td></tr>
+        <tr><td><b>히알샤워 CH</b><br><small style="color:var(--muted)">키트 상품</small></td>
+          <td class="num">9,454</td>
+          <td class="num" style="color:var(--bad)">0</td>
+          <td class="num">18,580</td>
+          <td><span class="tag neu">무가시딩</span> 효율은 낮지만 비용 0에 가까움</td></tr>
+        <tr><td><b>히알샤워 OH</b><br><small style="color:var(--muted)">옴므 키트</small></td>
+          <td class="num" style="color:var(--bad)">952</td>
+          <td class="num" style="color:var(--bad)">0</td>
+          <td class="num" style="color:var(--good)">89,808</td>
+          <td><span class="tag warn">유가집중</span> 무가시딩 거의 무용</td></tr>
+        <tr><td><b>PB</b> <span class="tag neu">프바크림</span></td>
+          <td class="num" style="color:var(--bad)">547</td>
+          <td class="num">24,635</td>
+          <td class="num" style="color:var(--good)">176,930</td>
+          <td><span class="tag warn">유가집중</span> 무가시딩 사실상 0</td></tr>
+        <tr><td><b>GF</b> <span class="tag neu">기능성</span></td>
+          <td class="num" style="color:var(--good)">92,286</td>
+          <td class="num">4,873</td>
+          <td class="num neu">데이터 없음</td>
+          <td><span class="tag good">무가시딩 ★</span> 적은 표본이지만 폭발적</td></tr>
       </tbody>
     </table>
-  `;
-}
+    <div class="diag" style="margin-top:16px">
+      <strong>🔍 인사이트</strong>
+      <p>① <span class="hl-good">CH 퍼펙트(결광 핵심)</span>는 무가시딩이 가장 효율적 — 시딩 더 늘리세요.<br>
+      ② <span class="hl-good">CH 듀이(물광)</span>는 오가닉이 1위 — 시딩보다 자연 검색·구전 동력. SEO·해시태그 관리.<br>
+      ③ <span class="hl-bad">OH·CH 옴므·PB·히알샤워 OH</span>는 무가시딩 사실상 실패 — 유가 집중하거나 아예 보류.<br>
+      <strong style="color:#fff">"라인 일률" 마케팅 = 예산 절반 낭비</strong>. 라인별 다른 트랙으로 가야 합니다.</p>
+    </div>
+  </div>
 
-function renderRisingStars(d, containerId) {
-  const creators = aggregateCreators(d);
-  if (creators.length === 0) {
-    document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="icon">🚀</div><div class="title">떠오르는 인플루언서 준비 중</div><div class="sub">첫 데이터 수집 후 표시됩니다</div></div>';
-    return;
-  }
-  const candidates = creators.filter(c =>
-    c.mostRecentDays <= 60 && c.viralMultiplier >= 100 && c.totalViews >= 10000
-  );
-  const sorted = candidates.sort((a,b) => {
-    const scoreA = a.viralMultiplier * (1 / Math.max(a.mostRecentDays, 1));
-    const scoreB = b.viralMultiplier * (1 / Math.max(b.mostRecentDays, 1));
-    return scoreB - scoreA;
-  }).slice(0, 10);
+  <!-- Top 무가시딩 winners -->
+  <div class="grid g2" style="margin-top:22px">
+    <div class="card">
+      <h3>🏆 무가시딩 누적 조회수 TOP 10 (실제로 효율 검증된 채널)</h3>
+      <div class="sub">샘플 3만원으로 50만뷰+ 만든 채널 = ROI 200배 이상</div>
+      <div class="leaderboard" id="muLeader" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <h3>💎 유가협업 누적 조회수 TOP 10 (재계약 1순위)</h3>
+      <div class="sub">평균 조회수 일정 이상 검증된 협업 — 다음 계약 우선순위</div>
+      <div class="leaderboard" id="yuLeader" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
 
-  if (sorted.length === 0) {
-    document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="icon">🚀</div><div class="title">조건 충족 인플루언서 없음</div><div class="sub">데이터가 더 누적되면 표시됩니다</div></div>';
-    return;
-  }
+<!-- 03. PLATFORM MIX (NEW) -->
+<section>
+  <div class="section-label">Part 3 · Platform Mix · NEW</div>
+  <div class="section-title">X · 인스타 · 유튜브 — 플랫폼별 성과 비교</div>
+  <div class="section-desc">"인스타에만 집중되어 있다"는 지적에 대한 데이터 답변. 전량 재집계 결과 X는 바이럴 상단(최고 290만뷰)·IG는 중앙값(2만)이 안정적 — 두 채널의 특성이 다릅니다.</div>
 
-  document.getElementById(containerId).innerHTML = `
-    <table>
-      <thead><tr>
-        <th>#</th><th>크리에이터</th>
-        <th class="num">최신</th><th class="num">조회수</th><th class="num">바이럴배수</th><th>태그</th>
-      </tr></thead>
-      <tbody>
-        ${sorted.map((c,i) => `
-          <tr>
-            <td><strong>${i+1}</strong></td>
-            <td><a href="https://www.instagram.com/${c.user}/" target="_blank">@${c.user}</a>
-              ${c.mostRecentDays <= 14 ? '<span class="score-pill new">NEW</span>' : ''}
-            </td>
-            <td class="num" style="color:#fbbf24;">${c.mostRecentDays}일전</td>
-            <td class="num">${fmt(c.totalViews)}</td>
-            <td class="num multiplier">${fmtX(c.viralMultiplier)}</td>
-            <td><span class="tag-keyword">${c.keywordList[0].length > 10 ? c.keywordList[0].slice(0,10)+'…' : c.keywordList[0]}</span></td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
+  <div class="card" style="margin-bottom:22px">
+    <h3>📡 SNS 플랫폼별 노출 효율</h3>
+    <div class="sub">1,632건(URL중복제거) — 같은 무가시딩도 플랫폼별 편차 큼: X 중앙값 909 vs IG 2만</div>
+    <div class="chart-wrap tall"><canvas id="platformChart"></canvas></div>
+  </div>
 
-function renderViralTable(d, containerId) {
-  const all = [];
-  d.keywords.forEach(k => k.topReels.forEach(r => all.push({...r, keyword: k.keyword})));
-  if (all.length === 0) {
-    document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="icon">🏆</div><div class="title">바이럴 랭킹 준비 중</div><div class="sub">첫 데이터 수집 후 표시됩니다</div></div>';
-    return;
-  }
-  all.sort((a,b) => b.views - a.views);
-  const top = all.slice(0, 10);
-  document.getElementById(containerId).innerHTML = `
-    <table>
-      <thead><tr>
-        <th>#</th><th>작성자</th><th>키워드</th><th>업로드</th>
-        <th class="num">좋아요</th><th class="num">댓글</th><th class="num">인게이지먼트</th><th class="num">조회수</th><th>구분</th><th>링크</th>
-      </tr></thead>
-      <tbody>
-        ${top.map((r,i) => `
-          <tr>
-            <td>${i+1}</td>
-            <td><a href="https://www.instagram.com/${r.user}/" target="_blank"><strong>@${r.user}</strong></a></td>
-            <td><a href="${kwSearchUrl(r.keyword)}" target="_blank" style="color:#94a3b8;">${r.keyword}</a></td>
-            <td>${r.date}</td>
-            <td class="num">${r.likes.toLocaleString ? r.likes.toLocaleString() : r.likes}</td>
-            <td class="num">${r.comments != null ? (r.comments.toLocaleString ? r.comments.toLocaleString() : r.comments) : "-"}</td>
-            <td class="num" style="color:#34d399;">${r.engagement != null ? r.engagement.toLocaleString() : "-"}</td>
-            <td class="num">${fmt(r.views)}</td>
-            <td><span class="badge ${r.type === '실측' ? 'actual' : 'est'}">${r.type}</span></td>
-            <td><a href="${r.url}" target="_blank">릴스 ↗</a></td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-
-function renderKeywordDetail(d, containerId) {
-  const hasAny = d.keywords.some(k => k.topReels.length > 0);
-  if (!hasAny) {
-    document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="title">키워드별 상세 준비 중</div><div class="sub">첫 스케줄 실행 시 10개 키워드 각각 Top 5 릴스 정보가 표시됩니다</div></div>';
-    return;
-  }
-  document.getElementById(containerId).innerHTML = d.keywords.map(k => `
-    <div class="keyword-section">
-      <div class="kw-head">
-        <div>
-          <a class="kw-link" href="${kwSearchUrl(k.keyword)}" target="_blank">
-            #${k.rank} ${k.keyword} ↗
-          </a>
-          <span class="mini-chip">${k.reelCount}개 릴스</span>
-          <span class="mini-chip" style="color:#38bdf8;">총 ${fmt(k.totalViews)} 조회</span>
-        </div>
+  <div class="grid g3">
+    <div class="card" style="border-color:rgba(29,155,240,0.4)">
+      <h3><span class="plat-tag x">X</span> 트위터</h3>
+      <div class="sub">무가시딩 평균 31,369뷰·최고 290만(바이럴 상단·적중률 낮음)</div>
+      <div class="diag good" style="margin-top:10px">
+        <strong>강점</strong>
+        <p>• 무가시딩 157건 → 752만 뷰 (전체의 63%)<br>
+           • 도로 @dorotice5 한 명이 3건으로 <span class="hl-good">516만 뷰</span><br>
+           • 마니악 코덕 커뮤니티 강력, 입소문 빠름</p>
       </div>
-      ${k.topReels.length > 0 ? `
-      <table style="font-size:12px;">
-        <thead><tr><th>Top</th><th>작성자</th><th>업로드</th><th class="num">좋아요</th><th class="num">댓글</th><th class="num">인게이지먼트</th><th class="num">조회수</th><th>구분</th></tr></thead>
-        <tbody>
-          ${k.topReels.map((r,i) => `
-            <tr>
-              <td>${i+1}</td>
-              <td><a href="${r.url}" target="_blank">@${r.user}</a></td>
-              <td>${r.date}</td>
-              <td class="num">${r.likes.toLocaleString ? r.likes.toLocaleString() : r.likes}</td>
-              <td class="num">${r.comments != null ? (r.comments.toLocaleString ? r.comments.toLocaleString() : r.comments) : "-"}</td>
-              <td class="num" style="color:#34d399;">${r.engagement != null ? r.engagement.toLocaleString() : "-"}</td>
-              <td class="num">${fmt(r.views)}</td>
-              <td><span class="badge ${r.type==='실측'?'actual':'est'}">${r.type}</span></td>
-            </tr>
-          `).join('')}
-        </tbody>
+      <div class="diag warn" style="margin-top:10px">
+        <strong>약점·과제</strong>
+        <p>• 광고 전환 추적 어려움<br>
+           • 콘텐츠 휘발성 강함 (피드 흐름 빠름)<br>
+           • 검색 SEO에는 약함</p>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(225,48,108,0.4)">
+      <h3><span class="plat-tag ig">IG</span> 인스타그램</h3>
+      <div class="sub">압도적 콘텐츠량(395건) 대비 평균뷰 가장 낮음</div>
+      <div class="diag warn" style="margin-top:10px">
+        <strong>강점</strong>
+        <p>• 무가시딩 210건으로 가장 많이 진행<br>
+           • 유가협업 효율 높음 (평균 57,016뷰)<br>
+           • 시각적 브랜딩 자산 축적 가능</p>
+      </div>
+      <div class="diag" style="margin-top:10px">
+        <strong>약점·과제</strong>
+        <p>• 무가시딩 평균 15,536뷰 — X의 1/3<br>
+           • 자체 릴스 23건 중 11건이 1만 뷰 미만<br>
+           • <span class="hl-bad">선별 기준 강화 필요</span></p>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(255,77,79,0.4)">
+      <h3><span class="plat-tag yt">YT</span> 유튜브 (shorts+long)</h3>
+      <div class="sub">유가협업 효율 좋음 — 디테일 리뷰 자산화에 유리</div>
+      <div class="diag good" style="margin-top:10px">
+        <strong>강점</strong>
+        <p>• Shorts 무가시딩 평균 36,362뷰 (인스타 2배)<br>
+           • 유가협업 평균 84,154뷰<br>
+           • 검색 잔존성·재생목록 자산화 가능</p>
+      </div>
+      <div class="diag" style="margin-top:10px">
+        <strong>약점·과제</strong>
+        <p>• Long-form 무가시딩 효율 낮음 (12,475뷰)<br>
+           • 콘텐츠 제작 부담 큼<br>
+           • <span class="hl-bad">전문 크리에이터 풀이 얕음</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="c-title">📌 Part 3 결론: 플랫폼 믹스 재조정 권고안</div>
+    <p>
+    ① <span class="hl-good">X(트위터)</span>: 무가시딩 비중 50% → <strong style="color:#fff">65%로 확대</strong>. 코덕 트친 풀 발굴 전담자 1명 배치.<br>
+    ② <span class="hl">인스타그램</span>: 무가시딩 1만 뷰 미만 차단 + 유가협업으로 무게중심 이동. 릴스 자체 제작 비중 증가.<br>
+    ③ <span class="hl2">유튜브 Shorts</span>: 약사·뷰티전문 크리에이터 2~3명 안정 확보. Long-form은 유가협업 1건/분기 유지.<br>
+    ④ <span style="color:var(--muted)">스레드·틱톡·네이버</span>: 현재 효율 거의 0 — 자원 투입 보류.
+    </p>
+  </div>
+</section>
+
+<!-- 04. INFLUENCER RECOMMENDATIONS (NEW) -->
+<section>
+  <div class="section-label">Part 4 · Recommended Influencers</div>
+  <div class="section-title">로직 기반 추천 인플루언서 리스트</div>
+  <div class="section-desc">
+    선정 기준: ① 모니터링 데이터에서 실제 평균 조회수 검증 ② 팔로워 대비 조회수 비율(V/S) ③ 우리 라인과 적합성.
+    플랫폼별·노출타입별로 분리. 모든 채널에 직접 링크 연결.
+  </div>
+
+  <!-- OPINION: 저점매수 vs 재활용 -->
+  <div class="card" style="margin-bottom:22px;border-color:rgba(251,191,36,0.4)">
+    <h3>🗣️ Opinion — 유가 계약 풀 분석 (93명) · "검증재활용형 비중 확대"가 답</h3>
+    <div class="sub">모니터링 시트의 노출 유형 컬럼에서 추출 · 진행건수·팔로워·평균뷰로 분류</div>
+
+    <div class="grid g3" style="gap:16px;margin-top:8px">
+      <div style="background:linear-gradient(135deg,rgba(74,222,128,0.12),transparent);border:1px solid rgba(74,222,128,0.35);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--good);font-weight:800;margin-bottom:8px">검증재활용형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">31명 (33%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">진행건수 ≥2 또는 평균 10만뷰+ 검증<br>평균 <b style="color:var(--good)">131,044뷰/건</b><br><span style="color:var(--muted);font-size:12px">예: 도로·Nuki·코덕요정·ubsi·쥬바비</span></div>
+      </div>
+      <div style="background:rgba(20,26,46,0.55);border:1px solid var(--border);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--warn);font-weight:800;margin-bottom:8px">중간형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">37명 (40%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">단건 진행 / 팔로워 ≥1만<br>평균 <b style="color:#fff">18,349뷰/건</b><br><span style="color:var(--muted);font-size:12px">2회차 결과 보고 검증풀 승격 판단</span></div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(248,113,113,0.12),transparent);border:1px solid rgba(248,113,113,0.35);border-radius:14px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:1.5px;color:var(--bad);font-weight:800;margin-bottom:8px">저점매수형</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:6px">25명 (27%)</div>
+        <div style="font-size:13px;color:#c6cee4;line-height:1.55">단건 진행 / 팔로워 &lt;1만<br>평균 <b style="color:var(--bad)">8,029뷰/건</b><br><span style="color:var(--muted);font-size:12px">검증재활용형 대비 1/16 효율</span></div>
+      </div>
+    </div>
+
+    <div class="diag good" style="margin-top:18px">
+      <strong>💡 권고 — 신규 계약 비중 재조정 (검증재활용형 50% / 중간형 30% / 저점매수형 20%)</strong>
+      <p>
+      현재 분포는 <span class="hl">검증재활용 33% / 중간 40% / 저점매수 27%</span>인데, <strong style="color:#fff">평균뷰 격차가 검증:저점 = 16배</strong>라서 저점매수형 비중을 자연 감소시키고 검증풀을 늘리는 방향이 ROI 측면에서 명백합니다. 특히 결광 스킨핏프렙처럼 가속 중인 SKU는 "새로운 사람 발굴"보다 "이미 터뜨린 사람에게 결광 라인으로 확장 계약"이 효율적입니다.<br><br>
+      최근 6주(W12+) 활동 중인 유가 인플루언서는 <strong style="color:#fff">44명</strong>입니다. 이 중 검증재활용형부터 결광 스킨핏프렙·물광 크림 시즌 계약 우선 확장 권고.
+      </p>
+    </div>
+
+    <div class="diag warn" style="margin-top:14px">
+      <strong>⚠️ "인플루언서 피로도" 관리법</strong>
+      <p>같은 인플루언서 반복 사용 시 뷰 감소 우려에 대해 — 모니터링 데이터로 보면 <strong style="color:#fff">ubsi(@Whoop_sie) 4건 평균 31.9만뷰, 살림토끼 4건 평균 20.3만뷰, 코덕요정 4건 평균 27.2만뷰</strong>로 <span class="hl-good">피로도 신호가 거의 없습니다</span>. 핵심은 ① 제품/라인을 바꿔가며 의뢰, ② 3개월 간격 유지, ③ 같은 포맷 반복 대신 새로운 앵글 요청 — 이 3가지만 지키면 검증풀은 캠페인 자산입니다.</p>
+    </div>
+
+    <div class="diag" style="margin-top:14px">
+      <strong>📋 무가시딩 풀 실측 (참고)</strong>
+      <p>무가시딩 누적 <strong style="color:#fff">337명 · 423건</strong> 진행. 팔로워&lt;1만 채널 176명 평균 <b>15,000뷰</b>. 무가 콘텐츠 1만뷰+ 성공률 <b>17%</b>·10만뷰+ 대박률 <b>5%</b>. 유가 저점매수형보다 무가시딩이 가성비 측면에서 우수 — 신규 발굴은 무가시딩으로, 유가는 검증풀 위주로.</p>
+    </div>
+  </div>
+
+  <!-- 검증된 재활용 TOP 리스트 -->
+  <div class="card" style="margin-bottom:22px;border-color:rgba(74,222,128,0.4)">
+    <h3>♻️ 즉시 재계약 권고 TOP 12 — "이미 우리 제품으로 터뜨린 사람들"</h3>
+    <div class="sub">모니터링 데이터에서 더랩바이블랑두 제품으로 복수건 진행 + 평균 5만뷰 이상 달성한 검증 채널</div>
+    <table style="margin-top:14px">
+      <thead><tr>
+        <th>순위</th>
+        <th>채널 (직링)</th>
+        <th>플랫폼</th>
+        <th class="num">누적 조회수</th>
+        <th class="num">평균 뷰</th>
+        <th>기 진행 노출타입</th>
+        <th>재계약 제안</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><b>1</b></td>
+          <td><a class="ig-link" href="https://x.com/dorotice5" target="_blank">도로 @dorotice5</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num" style="color:var(--good)">516만</td>
+          <td class="num" style="color:var(--good)">172만</td>
+          <td><span class="tag good">무가시딩</span></td>
+          <td><strong>결광 스킨핏프렙 전용 3건 연속 시딩</strong> — 최우선 1순위</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><a class="ig-link" href="https://x.com/tenshi4everr3" target="_blank">Nuki @tenshi4everr3</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num" style="color:var(--good)">162만</td>
+          <td class="num" style="color:var(--good)">40만</td>
+          <td><span class="tag warn">유가협업</span> <span class="tag neu">오가닉</span></td>
+          <td>결광 라인 유가 재계약 + 자발적 후속 유도</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><a class="ig-link" href="https://x.com/maleu557290" target="_blank">마르 @maleu557290</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num" style="color:var(--good)">113만</td>
+          <td class="num" style="color:var(--good)">40만</td>
+          <td><span class="tag good">무가시딩</span></td>
+          <td>물광·결광 병행 시딩으로 라인 확장</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><a class="ig-link" href="https://www.instagram.com/codukyojung/" target="_blank">코덕요정</a></td>
+          <td><span class="plat-tag ig">IG</span> <span class="plat-tag yt">YT</span></td>
+          <td class="num" style="color:var(--good)">109만</td>
+          <td class="num" style="color:var(--good)">27만</td>
+          <td><span class="tag warn">유가협업</span></td>
+          <td>4건 중 3건이 10만뷰+ — 옴므 유가 재계약 1순위</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><a class="ig-link" href="https://x.com/Whoop_sie" target="_blank">ubsi @Whoop_sie</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num" style="color:var(--good)">131만</td>
+          <td class="num" style="color:var(--good)">26만</td>
+          <td><span class="tag warn">유가협업</span> <span class="tag neu">오가닉</span></td>
+          <td>5건 중 4건 10만뷰+ — 옴므 + 결광 동시 확대</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><a class="ig-link" href="https://www.instagram.com/ju_ba_bee/" target="_blank">쥬바비 @ju_ba_bee</a></td>
+          <td><span class="plat-tag ig">IG</span> <span class="plat-tag yt">YT</span></td>
+          <td class="num" style="color:var(--good)">74만</td>
+          <td class="num" style="color:var(--good)">25만</td>
+          <td><span class="tag warn">유가협업</span> <span class="tag neu">오가닉</span></td>
+          <td>결광 스킨핏프렙 IG+YT 패키지 재계약</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><a class="ig-link" href="https://www.instagram.com/hanchaeng/" target="_blank">한채영 @hanchaeng</a></td>
+          <td><span class="plat-tag ig">IG</span> <span class="plat-tag yt">YT</span></td>
+          <td class="num" style="color:var(--good)">64만</td>
+          <td class="num" style="color:var(--good)">21만</td>
+          <td><span class="tag warn">유가협업</span> <span class="tag neu">오가닉</span></td>
+          <td>히알샤워 OH 이미 실적 — 결광 확장 권고</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><a class="ig-link" href="https://www.instagram.com/salim_ttokki/" target="_blank">살림토끼</a></td>
+          <td><span class="plat-tag ig">IG</span> <span class="plat-tag yt">YT</span></td>
+          <td class="num" style="color:var(--good)">81만</td>
+          <td class="num" style="color:var(--good)">20만</td>
+          <td><span class="tag warn">유가협업</span></td>
+          <td>4건 모두 10만뷰+ — 히알샤워 OH 최강자</td>
+        </tr>
+        <tr>
+          <td><b>9</b></td>
+          <td><a class="ig-link" href="https://x.com/kitrain_" target="_blank">소오 @kitrain_</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num">33.8만</td>
+          <td class="num" style="color:var(--good)">17만</td>
+          <td><span class="tag warn">유가협업</span></td>
+          <td>결광 라인으로 2차 유가 진행</td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td><a class="ig-link" href="https://x.com/Somuch7luck" target="_blank">Somuch @Somuch7luck</a></td>
+          <td><span class="plat-tag x">X</span></td>
+          <td class="num">56만</td>
+          <td class="num">11만</td>
+          <td><span class="tag good">무가시딩</span></td>
+          <td>5건 진행에도 뷰 안정 — 정기 시딩 풀 확정 편성</td>
+        </tr>
+        <tr>
+          <td><b>11</b></td>
+          <td><a class="ig-link" href="https://www.youtube.com/@viewdrumin" target="_blank">뷰드름 유튜버 인씨</a></td>
+          <td><span class="plat-tag yt">YT</span></td>
+          <td class="num">71만</td>
+          <td class="num">10만</td>
+          <td><span class="tag neu">오가닉</span> <span class="tag good">무가시딩</span></td>
+          <td>7건 진행 — 단건 43만뷰 기록. 유가 전환 협의</td>
+        </tr>
+        <tr>
+          <td><b>12</b></td>
+          <td><a class="ig-link" href="https://www.youtube.com/shorts/mmOVWoqIMbk" target="_blank">겸다미 (YT Shorts)</a></td>
+          <td><span class="plat-tag yt">YT</span></td>
+          <td class="num">39.5만</td>
+          <td class="num">9.9만</td>
+          <td><span class="tag neu">오가닉</span> <span class="tag good">무가시딩</span></td>
+          <td>결광 라인 Shorts 2편 시즌 계약</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:18px">
+      <div class="c-title">🔁 재활용 전략 실행안 (4단계)</div>
+      <p>
+      <strong style="color:#fff">1단계 · 즉시 (1~2주):</strong> 도로·Nuki·ubsi·코덕요정 4명 결광 스킨핏프렙 전용 캠페인 제안서 발송<br>
+      <strong style="color:#fff">2단계 · 3주:</strong> 쥬바비·한채영·살림토끼 결광 라인 확장 계약 (현재 옴므·히알샤워 OH 중심 → 결광 추가)<br>
+      <strong style="color:#fff">3단계 · 6주:</strong> Somuch·마르·미에리·PIA(X 트친 풀) 정기 시딩 풀 확정 편성 · 월 2건 할당<br>
+      <strong style="color:#fff">4단계 · 지속:</strong> 업로드 후 실제 조회수 추적 → 90일 단위로 재활용 풀 갱신 (뷰 감소 시 로테이션)
+      </p>
+    </div>
+  </div>
+
+  <!-- X recommended -->
+  <div class="card" style="margin-bottom:22px;border-color:rgba(29,155,240,0.4)">
+    <h3><span class="plat-tag x">X</span> X(트위터) 무가시딩 추천 TOP — "씨딩 1만원에 100만뷰"</h3>
+    <div class="sub">팔로워 적어도 V/S 비율 압도적인 코덕 트친 — 비용 대비 폭발력 검증됨</div>
+    <table style="margin-top:14px">
+      <thead><tr><th>순위</th><th>채널 (X 직링)</th><th class="num">무가 누적뷰</th><th class="num">팔로워</th><th class="num">V/S 비율</th><th>추천 라인</th></tr></thead>
+      <tbody>
+        <tr><td><b>1</b></td><td><a class="ig-link" href="https://x.com/dorotice5" target="_blank">@dorotice5 (도로)</a></td><td class="num" style="color:var(--good)">516만</td><td class="num">2.97만</td><td class="num" style="color:var(--good)">173배</td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>2</b></td><td><a class="ig-link" href="https://x.com/Somuch7luck" target="_blank">@Somuch7luck (Somuch)</a></td><td class="num" style="color:var(--good)">56만</td><td class="num">887</td><td class="num" style="color:var(--good)">632배</td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>3</b></td><td><a class="ig-link" href="https://x.com/maleu557290" target="_blank">@maleu557290 (마르)</a></td><td class="num" style="color:var(--good)">79만</td><td class="num">6,223</td><td class="num" style="color:var(--good)">128배</td><td><span class="tag good">결광·물광 모두</span></td></tr>
+        <tr><td><b>4</b></td><td><a class="ig-link" href="https://x.com/dewmieri" target="_blank">@dewmieri (미에리)</a></td><td class="num">15.9만</td><td class="num">1,890</td><td class="num" style="color:var(--good)">84배</td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>5</b></td><td><a class="ig-link" href="https://x.com/_forpink00" target="_blank">@_forpink00 (PIA)</a></td><td class="num">10.6만</td><td class="num">8,584</td><td class="num">12배</td><td><span class="tag good">결광·물광</span></td></tr>
+        <tr><td><b>6</b></td><td><a class="ig-link" href="https://x.com/pastyhayo" target="_blank">@pastyhayo (키코)</a></td><td class="num">7.7만</td><td class="num">4.73만</td><td class="num">1.6배</td><td><span class="tag good">결광·물광</span></td></tr>
+      </tbody>
+    </table>
+    <div class="diag good" style="margin-top:16px">
+      <strong>📌 X 추천 전략</strong>
+      <p>도로(@dorotice5)는 이미 검증된 폭발형 — <strong style="color:#fff">결광 스킨핏프렙 신규 캠페인 1순위 시딩 대상</strong>.
+      Somuch·마르는 V/S 비율이 100배 이상이므로 정기 시딩 풀에 우선 편성.
+      나머지는 신상품 런칭 시 분산 시딩 후 결과 측정.</p>
+    </div>
+  </div>
+
+  <!-- IG recommended -->
+  <div class="card" style="margin-bottom:22px;border-color:rgba(225,48,108,0.4)">
+    <h3><span class="plat-tag ig">IG</span> 인스타그램 추천 TOP — "검증된 사람만 다시"</h3>
+    <div class="sub">실측 평균 조회수 1만+ 인스타 인플루언서. 무가/유가 구분 명시.</div>
+    <table style="margin-top:14px">
+      <thead><tr><th>순위</th><th>채널 (IG 직링)</th><th class="num">평균 조회수</th><th class="num">팔로워</th><th>노출 타입</th><th>추천 라인</th></tr></thead>
+      <tbody>
+        <tr><td><b>1</b></td><td><a class="ig-link" href="https://www.instagram.com/lobit_beauty/" target="_blank">@lobit_beauty (로빗)</a></td><td class="num" style="color:var(--good)">122만</td><td class="num">4,063</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (검증)</span></td></tr>
+        <tr><td><b>2</b></td><td><a class="ig-link" href="https://www.instagram.com/cos_fairyy/" target="_blank">@cos_fairyy</a></td><td class="num" style="color:var(--good)">303만</td><td class="num">정보 부족</td><td><span class="tag good">자체 릴스</span></td><td><span class="tag good">물광 (이미 폭발)</span></td></tr>
+        <tr><td><b>3</b></td><td><a class="ig-link" href="https://www.instagram.com/ei_jyojyo23/" target="_blank">@ei_jyojyo23 (이지호이죠)</a></td><td class="num" style="color:var(--good)">41.8만</td><td class="num">10.5만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>4</b></td><td><a class="ig-link" href="https://www.instagram.com/ojirapper_/" target="_blank">@ojirapper_ (오지랖퍼)</a></td><td class="num" style="color:var(--good)">56.9만</td><td class="num">3,726</td><td><span class="tag neu">오가닉</span></td><td><span class="tag good">물광 (CH 듀이)</span></td></tr>
+        <tr><td><b>5</b></td><td><a class="ig-link" href="https://www.instagram.com/whoop_sie/" target="_blank">@Whoop_sie (ubsi)</a></td><td class="num" style="color:var(--good)">31.9만</td><td class="num">4.09만</td><td><span class="tag warn">유가협업</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>6</b></td><td><a class="ig-link" href="https://www.instagram.com/codukyojung/" target="_blank">@코덕요정</a></td><td class="num" style="color:var(--good)">27.2만</td><td class="num">7.2만</td><td><span class="tag warn">유가협업</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>7</b></td><td><a class="ig-link" href="https://www.instagram.com/tabemacle/" target="_blank">@tabemacle (플리즈)</a></td><td class="num">22.5만</td><td class="num">13.4만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>8</b></td><td><a class="ig-link" href="https://www.instagram.com/ujjja_e/" target="_blank">@ujjja_e (모하뉴)</a></td><td class="num">18.4만</td><td class="num">9만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag neu">GF</span></td></tr>
+        <tr><td><b>9</b></td><td><a class="ig-link" href="https://www.instagram.com/__princess__s2_/" target="_blank">@__princess__s2_ (샛벼리)</a></td><td class="num">18.4만</td><td class="num">332</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (CH 퍼펙트) ★ V/S 554배</span></td></tr>
+        <tr><td><b>10</b></td><td><a class="ig-link" href="https://www.instagram.com/beautiful_yaksa/" target="_blank">@beautiful_yaksa</a></td><td class="num">7.3만</td><td class="num">검증요</td><td><span class="tag neu">오가닉</span></td><td><span class="tag good">약사형 — 결광 신뢰도</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- YT recommended -->
+  <div class="card" style="margin-bottom:22px;border-color:rgba(255,77,79,0.4)">
+    <h3><span class="plat-tag yt">YT</span> 유튜브 추천 TOP — "Shorts 중심 + 약사·전문 크리에이터"</h3>
+    <div class="sub">Shorts 무가시딩과 유가협업 모두 평균 뷰 검증. 클릭 시 실제 콘텐츠 이동.</div>
+    <table style="margin-top:14px">
+      <thead><tr><th>순위</th><th>채널 (YT 콘텐츠 직링)</th><th class="num">평균 조회수</th><th class="num">구독자</th><th>노출 타입</th><th>추천 라인</th></tr></thead>
+      <tbody>
+        <tr><td><b>1</b></td><td><a class="ig-link" href="https://www.youtube.com/shorts/mmOVWoqIMbk" target="_blank">겸다미</a></td><td class="num" style="color:var(--good)">12.7만 (Shorts)</td><td class="num">11만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>2</b></td><td><a class="ig-link" href="https://youtube.com/shorts/1BwWZCFQZ7I" target="_blank">로빗 lobit</a></td><td class="num" style="color:var(--good)">20.3만 (Shorts)</td><td class="num">825</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (CH 퍼펙트) ★ V/S 245배</span></td></tr>
+        <tr><td><b>3</b></td><td><a class="ig-link" href="https://www.youtube.com/@viewdrumin" target="_blank">뷰드름 유튜버 인씨</a></td><td class="num" style="color:var(--good)">11.2만 (avg)</td><td class="num">56.2만</td><td><span class="tag neu">오가닉</span></td><td><span class="tag good">결광·물광 모두</span></td></tr>
+        <tr><td><b>4</b></td><td><a class="ig-link" href="https://www.youtube.com/@codukyojung" target="_blank">코덕요정</a></td><td class="num" style="color:var(--good)">42.2만 (Shorts)</td><td class="num">7.2만</td><td><span class="tag warn">유가협업</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>5</b></td><td><a class="ig-link" href="https://www.youtube.com/@iamjiwon" target="_blank">나는지원g_one</a></td><td class="num">27.9만 (Long)</td><td class="num">6.7만</td><td><span class="tag warn">유가협업</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>6</b></td><td><a class="ig-link" href="https://www.youtube.com/shorts/1rJPKy5vujg" target="_blank">플리즈</a></td><td class="num">8.3만 (Shorts)</td><td class="num">11만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag neu">OH</span></td></tr>
+        <tr><td><b>7</b></td><td><a class="ig-link" href="https://youtube.com/shorts/twPFSv3cQIU" target="_blank">똑주부</a></td><td class="num">7.9만 (Shorts)</td><td class="num">1.09만</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>8</b></td><td><a class="ig-link" href="https://www.youtube.com/@dr.eunchogreen" target="_blank">은초</a></td><td class="num">5.2만 (Shorts)</td><td class="num">3,093</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">결광 (CH 퍼펙트)</span></td></tr>
+        <tr><td><b>9</b></td><td><a class="ig-link" href="https://www.youtube.com/watch?v=9WdAKAGCBI0" target="_blank">피부는 희쌤</a></td><td class="num">5.1만 (Long)</td><td class="num">전문</td><td><span class="tag good">무가시딩</span></td><td><span class="tag good">약사형 ★</span></td></tr>
+      </tbody>
+    </table>
+    <div class="diag good" style="margin-top:16px">
+      <strong>📌 유튜브 추천 전략</strong>
+      <p>① Shorts 무가시딩: 겸다미·로빗·똑주부·은초 정기 풀 편성 (월 2건 무가).<br>
+      ② 유가협업: 코덕요정·나는지원g_one은 옴므 라인 캠페인 시 안정 확보 (이미 검증됨).<br>
+      ③ <span class="hl">신규 발굴</span>: '피부는 희쌤'급 약사·피부 전문가 2~3명 추가 컨택 → 결광 라인 신뢰도 자산.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05. SNS DIAGNOSTIC (Daiso only) -->
+<section>
+  <div class="section-label">Part 5 · 자체 릴스 진단</div>
+  <div class="section-title">더랩바이블랑두 자체 인스타 릴스 23건 정밀 진단</div>
+  <div class="section-desc">자체 시딩 릴스 23건 전수 검토 + 다이소 키워드 경쟁 노출 비교</div>
+
+  <div class="card" style="margin-bottom:22px">
+    <h3>📱 자체 릴스 23건 — 클릭하면 실제 릴스 이동</h3>
+    <div class="sub">조회수 높은 순 정렬 · 모든 계정명에 인스타 직링 연결</div>
+    <div id="reelList" style="margin-top:16px"></div>
+  </div>
+
+  <div class="diag" style="margin-bottom:22px">
+    <strong>진단: 1건 바이럴 의존 + 허리가 얇음</strong>
+    <p>23건 중 cos_fairyy 1건(303만 뷰)이 전체의 <span class="hl-bad">약 80%</span>. 평균 4만뷰, 11건(48%)이 5천 뷰 미만 종료. 시딩 기준 강화 + 검증된 X 채널로 무게중심 이동 필요.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:22px">
+    <h3>🔍 다이소 주요 키워드 × 인스타 릴스 Top 조회수</h3>
+    <div class="sub">2026-06-16 다이소몰 베스트 Top 10 (뷰티) · YT 키워드별 Top 영상 · <span style="color:var(--warn)">IG 릴스 스토어 06-13 이후 정지(3일 stale)</span></div>
+      <h4 style="margin-top:18px;color:var(--accent);font-size:14px;letter-spacing:1px">\g<1>
+        <tr><td><b>#1 [VT]</b> [퀵수분충전]VT PDRN 광채 토너 200 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 7,808</td></tr>
+        <tr><td><b>#2 [마미케어]</b> 마미케어 바다포도 모공세럼 30 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 1,100</td></tr>
+        <tr><td><b>#3 [마데카21]</b> 마데카21 테카 솔루션 수딩 미스트 토너 200 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 9,999+</td></tr>
+        <tr><td><b>#4 [본셉]</b> 본셉 비타씨 동결 건조 더블샷 앰플 키트</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 9,999+</td></tr>
+        <tr><td><b>#7 [VT]</b> [수분충전]VT PDRN 광채 시트 마스크 1매 25 g</td><td class="num">1,000원</td><td class="num">★4.8 · 리뷰 4,480</td></tr>
+        <tr><td><b>#8 [싸이닉]</b> 싸이닉 엔조이 아쿠아 에어핏 선스틱 15 g</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 823</td></tr>
+        <tr><td><b>#9 [더랩]</b> 더랩 바이 블랑두 클리어 히알 물광 부스터 앰플 30 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 4,793</td></tr>
+        <tr><td><b>#10 [썸머글로시]</b> 썸머글로시 해파리 샴푸 브러시</td><td class="num">3,000원</td><td class="num">★4.8 · 리뷰 86</td></tr>
+        <tr><td><b>#11 [본셉]</b> 본셉 레티놀 2500 IU 링클샷 퍼펙터 15 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 7,792</td></tr>
+        <tr><td><b>#12 [마데카21]</b> 마데카21 테카 솔루션 수딩 크림 50 ml</td><td class="num">5,000원</td><td class="num">★4.8 · 리뷰 6,452</td></tr>
+        \g<2>
       </table>
-      ` : '<div style="color:#64748b;font-size:12px;padding:8px 0;">수집 대기 중</div>'}
+      <h4 style="margin-top:24px;color:var(--accent);font-size:14px;letter-spacing:1px">\g<1>
+        <tr><td><b>VT PDRN 광채</b></td><td>리틀약사 Shorts</td><td>2026-06-02</td><td class="num">2,599,642</td></tr>
+        <tr><td><b>VT 리들샷 300</b></td><td>은혜로운은혜</td><td>2026-05-21</td><td class="num">717,314</td></tr>
+        <tr><td><b>더마블록 마일드 선스틱</b></td><td>살림토끼</td><td>2026-05-18</td><td class="num">371,410</td></tr>
+        <tr><td><b>줌 바이 정샘물</b></td><td>디에디트 라이프 THE EDIT</td><td>2026-06-02</td><td class="num">295,897</td></tr>
+        <tr><td><b>더랩 바이 블랑두 (우리)</b></td><td>다영 DAYEONG</td><td>2026-06-01</td><td class="num">275,598</td></tr>
+        \g<2>
+      </table>
+  </div>
+</section>
+
+<!-- 06. COMPETITOR -->
+<section>
+  <div class="section-label">Part 6 · Competitor Pattern</div>
+  <div class="section-title">다이소 내 경쟁사가 쓰는 공식</div>
+  <div class="section-desc">다이소몰 Top 10 진입 브랜드 — VT(2SKU) · 본셉(2SKU) · 마데카21(2SKU) · 더랩(1SKU) 등을 분해 (2026-06-16 다이소몰 + YT 크롤)</div>
+
+  <div class="card" style="padding:32px;margin-bottom:22px">
+    <h3 style="margin-bottom:20px">경쟁사 vs 더랩바이블랑두 Head-to-Head</h3>
+    <div class="matrix">
+      <div class="mhead"></div>
+      <div class="mhead">더랩바이블랑두</div>
+      <div class="mhead">VT (PDRN)</div>
+      <div class="mhead">본셉 (비타씨)</div>
+      <div class="mhead">메디필 · 마데카21</div>
+      <div class="mrow">다이소 랭킹 최고점</div>
+      <div class="mcell mid">9위 (부스터앰플)</div>
+      <div class="mcell win">1위 (PDRN토너)</div>
+      <div class="mcell win">4위 (비타씨)</div>
+      <div class="mcell mid">3위 (테카)</div>
+      <div class="mrow">YT 키워드 최고 조회수</div>
+      <div class="mcell mid">27.6만 뷰</div>
+      <div class="mcell win">260.0만 뷰</div>
+      <div class="mcell mid">25.5만 뷰</div>
+      <div class="mcell mid">15.8만 뷰</div>
+      <div class="mrow">IG 누적 추정뷰* (likes×30, 05-07 stale)</div>
+      <div class="mcell mid">81.2만*</div>
+      <div class="mcell mid">0만*</div>
+      <div class="mcell win">44.4만*</div>
+      <div class="mcell mid">7.1만*</div>
+      <div class="mrow">핵심 성분 훅</div>
+      <div class="mcell mid">히알루론산 (범용)</div>
+      <div class="mcell win">PDRN (독점)</div>
+      <div class="mcell win">비타씨 동결건조</div>
+      <div class="mcell win">테카·마데카소사이드</div>
     </div>
-  `).join('');
-}
+  </div>
+</section>
 
-function renderTab(data, prefix, isOliveyoung) {
-  const pal = isOliveyoung ? oliveyoungPalette : palette;
-  renderKeywordCards(data, prefix, isOliveyoung);
-  renderKeywordBar(data, prefix + '-keywordBar', pal);
-  renderTopInfluencers(data, prefix + '-topInfluencers');
-  renderRisingStars(data, prefix + '-risingStars');
-  renderViralTable(data, prefix + '-viralTable');
-  renderKeywordDetail(data, prefix + '-keywordDetail');
-}
+<!-- 07. ACTION PLAN -->
+<section>
+  <div class="section-label">Part 7 · Action Plan</div>
+  <div class="section-title">90일 액션 로드맵 (개정안)</div>
+  <div class="section-desc">P1=이번 달 · P2=다음 달 · P3=분기 내. 신규 데이터 반영 우선순위 재배열.</div>
 
-// 탭 전환
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    // 타임스탬프 전환 (YouTube 탭은 iframe 내부 타임스탬프를 사용하므로 스킵)
-    const tab = btn.dataset.tab;
-    if (tab === 'daiso' || tab === 'oliveyoung') {
-      const data = tab === 'daiso' ? DAISO_DATA : OLIVEYOUNG_DATA;
-      document.getElementById('lastUpdated').textContent = new Date(data.lastUpdated).toLocaleString('ko-KR');
-    } else if (tab === 'youtube') {
-      document.getElementById('lastUpdated').textContent = 'YouTube 대시보드 (iframe)';
-    }
+  <div class="action-item">
+    <div class="pri p1">P1</div>
+    <div>
+      <div class="action-title">[NEW] 검증재활용형 31명 결광 라인 확장 계약 (재활용 50% + 중간 30% + 저점 20% 권고 믹스)</div>
+      <div class="action-desc">유가 계약 풀 93명 중 검증재활용형은 31명(33%)으로 평균 131,044뷰. 도로·Nuki·코덕요정·ubsi·쥬바비·한채영·살림토끼 등에게 결광 스킨핏프렙·물광 크림 시즌 계약 1~2주 내 발송. 저점매수형(25명, 평균 8,029뷰)은 자연 감소 + 무가시딩으로 대체.</div>
+    </div>
+    <div class="action-owner">인플루언서팀 · 2주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p1">P1</div>
+    <div>
+      <div class="action-title">[NEW] X(트위터) 시딩 트랙 분리·강화</div>
+      <div class="action-desc">CPM 1,035원의 X 채널을 별도 트랙화. 도로(@dorotice5)·Somuch(@Somuch7luck)·마르(@maleu557290) 결광 스킨핏프렙 시딩 즉시 진행. 신규 X 코덕 트친 풀 발굴 전담자 배치</div>
+    </div>
+    <div class="action-owner">인플루언서팀 · 2주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p1">P1</div>
+    <div>
+      <div class="action-title">결광 스킨핏프렙 플래그십 캠페인 (X·인스타·유튜브 통합)</div>
+      <div class="action-desc">누적 1위 + 최근 2주 -13.2% 변화. X(도로·Somuch) + IG(샛벼리·로빗) + YT Shorts(겸다미·로빗·똑주부) 동시 시딩으로 "결광 = 전처리 공식" 각인</div>
+    </div>
+    <div class="action-owner">브랜드팀 · 3주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p1">P1</div>
+    <div>
+      <div class="action-title">결광 세럼미스트 -17.7% 급감 원인 규명</div>
+      <div class="action-desc">누적 4위(4.36억). 매대·재고·경쟁 신제품 중 원인 7일 내 특정. 지속 감소 시 Q2 재고 조정</div>
+    </div>
+    <div class="action-owner">MD · 1주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p1">P1</div>
+    <div>
+      <div class="action-title">[NEW] 라인별 시딩 정책 차등화 — 일률 적용 중단</div>
+      <div class="action-desc">CH 퍼펙트·GF는 무가시딩 강화 / OH·CH 옴므·PB·히알샤워 OH는 무가시딩 보류·유가만 진행 / CH 듀이는 오가닉(SEO·해시태그) 강화. 라인별 KPI·예산 분리</div>
+    </div>
+    <div class="action-owner">전략·인플루언서팀 · 즉시</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p2">P2</div>
+    <div>
+      <div class="action-title">자체 릴스 시딩 기준 재설정 — "1만 뷰 미만 차단"</div>
+      <div class="action-desc">23건 중 11건(48%)이 5천 뷰 미만. 시딩 전 최근 3~5개 평균 1만+ + V/S 비율 10%+ 의무화. 인스타 23건 → 분기 12건으로 줄이고 X 30건으로 확대</div>
+    </div>
+    <div class="action-owner">인플루언서팀 · 1주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p2">P2</div>
+    <div>
+      <div class="action-title">유튜브 약사·전문가 풀 구축</div>
+      <div class="action-desc">'피부는 희쌤'급 약사·피부과 크리에이터 2~3명 무가시딩 컨택. 결광 라인 신뢰도 자산화. 마데카21 패턴 벤치마크</div>
+    </div>
+    <div class="action-owner">인플루언서팀 · 4주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p2">P2</div>
+    <div>
+      <div class="action-title">물광 3종 번들 프로모션 (반등 타이밍 활용)</div>
+      <div class="action-desc">크림·부스터·틴티드 동시 +4.8~+10.5% 반등. 5월 중 번들 매대 협상 + 기존 계약 인플루언서(뷰돈나·다영·보스) 활용</div>
+    </div>
+    <div class="action-owner">MD + 커뮤니케이션 · 3주</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p3">P3</div>
+    <div>
+      <div class="action-title">옴므 라인 — 유가협업으로만 운영 (선택과 집중)</div>
+      <div class="action-desc">% 성장 높지만 절대액 6.6%. 무가시딩 효율 0~1.5만뷰 — 자원 낭비. 옴므는 코덕요정·나는지원g_one 등 검증된 유가만 진행. 풀 캠페인 보류</div>
+    </div>
+    <div class="action-owner">전략 결정 · 즉시</div>
+  </div>
+  <div class="action-item">
+    <div class="pri p3">P3</div>
+    <div>
+      <div class="action-title">ROI 대시보드 자동화 (모니터링 시트 → 효율 KPI 직결)</div>
+      <div class="action-desc">2026 모니터링 1,094건 데이터를 주간 자동 집계 → CPM·V/S 비율·라인별 효율 자동 산출. 다음 계약 협상 데이터 근거</div>
+    </div>
+    <div class="action-owner">데이터팀 · 6주</div>
+  </div>
+
+  <div class="callout">
+    <div class="c-title">🎯 90일 후 목표 KPI (개정)</div>
+    <p>
+    ① 다이소 일평균 매출 <span class="hl">4,500만원</span> (+16%)<br>
+    ② 다이소 키워드 IG Top4 합산 <span class="hl">100만 뷰</span> (×5.4)<br>
+    ③ <span class="hl">X 시딩 비중 65%로 확대</span>, 무가시딩 1만뷰+ 성공률 28% → 50%<br>
+    ④ 단건 50만 뷰+ 릴스/숏츠 <span class="hl">분기 2건 이상</span> (현 1건 → 재현 가능 구조)<br>
+    ⑤ 라인별 차등 정책으로 시딩 ROI <span class="hl">전체 +40%</span>
+    </p>
+  </div>
+</section>
+
+<!-- CHANGELOG -->
+<section id="changelog" style="margin-top:64px">
+  <div class="section-label">Changelog · 변경 이력</div>
+  <div class="section-title">데이터 자동 갱신 이력</div>
+  <div class="section-desc">매 격주 월요일 09:00에 자동 실행되는 업데이트의 변경 이력입니다. 이전 값 → 새 값 형식으로 표기.</div>
+  <div id="changelogList" class="card" style="padding:8px 0"></div>
+</section>
+<script id="changelog-data" type="application/json">[{"date": "2026-06-16", "summary": "주간 자동 갱신 — [정정] 모니터링 전량(CSV) 재집계로 누적 1,632건 복원 + 매출 중복정리 반영 + 경쟁사 06-16", "changes": ["[매출] 소스 시트 중복행 정리 확인 — 1일 1행 연속(164일). 누적 56.72억(146일,~05-27) → 62.62억(164일,~06-14). +5.90억은 18일치 실데이터 동기화(정정 아님). 일평균 3,885 → 3,818만원(최근주 둔화 반영)", "라인 누적 비중: 물광 54.6% / 결광 38.2% / 옴므 7.2%. 코어3종(스킨핏프렙+물광크림+부스터앰플) 집중도 63.1%(39.50억)", "완전주 WoW: W24(06-08~14) 2.08억 vs W23(06-01~07) 2.27억 = -8.6%. 최근 5주 연속 둔화(W19 3.01억 → W24 2.08억)", "[모멘텀] 최근14일(06-01~14) vs 직전14일 — 가속 SKU: 옴므선크림 +19.3% / 결광젤클렌저 +4.5% / 결광선에센스 +1.6%. 약세: 결광겔마스크 -44.9% / 물광틴티드 -28.4% / 결광스킨핏프렙 -24.8%. 라인: 결광 -17.7% / 물광 -14.0% / 옴므 -4.7%", "[정정·모니터링] 지난 사이클 '327건'은 read_file_content 32K토큰 절단으로 인한 과소집계. 이번엔 CSV 전량(1,648행) 파싱 → URL 엄격 중복제거 후 누적 1,632건(초기 추적 1,094건(05-05) → 1,632건 궤적과 정합). 단일 플레이스홀더 URL('스토리 보관함') 322건은 계정별 개별 시딩으로 보존", "플랫폼(distinct): IG 754 / X 600 / YT 247 / 틱톡 16 / 스레드 10 / 네이버 5. 무가 1,180 / 유가 376 / 기타(이미지·매장) 76", "누적 5,319만뷰 · 평균 32,589뷰/건 · 10만뷰+ 126건", "[정정·플랫폼효율] 전량 데이터 재집계 결과 무가시딩 X 중앙값 909뷰(평균 31,369·최고 290만, 적중률 낮음·고천장) vs IG 중앙값 2만(평균 111,121). 기존 'X 3.1배 우위' 서술은 절단 데이터 산물 — 'X 바이럴·IG 안정 병행'으로 정정, platformData 갱신", "무가시딩 누적뷰 Top: 도로 518만(4건) / byudonna 171만(IG) / lobit_beauty 122만(IG) / 마르 113만 / 쿠키 61만", "유가협업 누적뷰 Top: 코덕요정 165만(YT·8건) / ubsi 128만(X) / 살림토끼 104만(IG·8건) / Nuki 101만 / 에디 73만", "V/S(조회수÷구독자) Top: 소묘 ×1561(27.3만/175,X) · boss.lim ×1427(43.4만/304,IG) · 로빗 ×865(22.8만/263,YT) — 초소형 분모(구독<10) 다수는 주의", "[경쟁사 06-16] 다이소몰 뷰티 Top10: #1 VT PDRN토너 · #2 마미케어 · #3·#12 마데카21 · #4·#11 본셉 · #7 VT마스크 · #8 싸이닉 · #9 더랩 물광부스터앰플(전주 #11 → #9 상승) · #10 썸머글로시", "YT 키워드 최고조회수(200영상): VT PDRN 광채 260.0만(리틀약사) · VT 리들샷300 71.7만 · 더마블록 선스틱 37.1만 · 줌 바이 정샘물 29.6만 · 더랩 바이 블랑두 27.6만(우리)", "IG 키워드 누적 추정뷰*(likes×30, 30일창): 더랩 81.2만*(우리·5릴스) · 본셉 비타씨 44.4만* · 프릴루드 딘토 19.0만* · 마데카21 7.1만*", "브랜드 매트릭스(Top10): VT 2SKU(평균3,000원) · 본셉 2SKU · 마데카21 2SKU · 더랩 1SKU(부스터앰플 #9)", "[경고] IG 릴스 스토어(ig_reel_store.json) 06-13 이후 3일째 정지(stale) — IG 추정뷰는 직전 스냅샷 기준 *추정. YT 크롤은 yt_2026-06-16 정상", "유가 CPM 계약단가(19,639원) 기존 하드코딩값 유지", "데이터 소스: monitoring sheet(06-15) / sales sheet(06-15, 데이터 06-14까지) / daiso_2026-06-16 / yt_2026-06-16 / ig_reel_store(06-13 stale)"]},
+{"date": "2026-06-09", "summary": "주간 자동 갱신 — [중요] 매출 시트 중복행 발견·정정 + 경쟁사(06-07) 신규 + 모니터링 URL 중복제거", "changes": ["[데이터 정정] 매출 시트에 2026-04-09~05-26(47일) 중복 입력행 발견(값 완전 동일). 지난주 \u002775.46억/195일\u0027은 중복 합산 과대계상 — 중복제거 후 정확 누적 = 56.72억/146일(2026-01-01~05-27). 소스 시트 중복행 정리 권장", "일평균 3,870만원 \u2192 3,885만원(정정)", "라인 누적 비중(정정): 물광 54.4% / 결광 38.6% / 옴므 7.0%", "코어3종 집중도 63.1%(35.77억, 정정)", "완전주 WoW: W21(05-18~24) 2.54억 vs W20(05-11~17) 2.67억 = -5.0%. 최근주 W22(05-25~27)는 부분주 3일 1.00억", "[모멘텀 둔화] 최근14일(05-14~27) vs 직전14일 전 SKU 음(-)성장 — 방어 Top3(하락 최소): 물광크림 -0.7% / 옴므선크림 -1.7% / 물광토너패드 -7.4%; 약세: 결광세럼미스트 -31.3% / 물광스킨토너 -20.4% / 결광스킨핏프렙 -14.1%. 라인: 결광 -16.8% / 옴므 -9.0% / 물광 -7.6%", "[모니터링] URL 기준 엄격 중복제거 \u2192 누적 327건(전주 328과 동수준). 플랫폼(콘텐츠 SNS 컬럼): X 166 / IG 109 / YT 50 / 네이버 2. 10만뷰+ 21건, 누적 1,328만뷰. 전주 split(IG71/X191/YT64)·2,060만뷰는 이중계상 포함분으로 추정 \u2192 본 사이클부터 dedup 기준 통일", "무가 276(오가닉77+무가시딩184+이벤트15) / 유가 40(유가협업6+체험단34) / 미분류 11", "V/S Top: 댕동이 @dangdooooong2 \u00d71383(X, 구독1명 극소분모 주의) · Somuch \u00d7486(43만뷰/887)", "Top 무가채널: 도로 @dorotice5 516만뷰(3건) · 사쿠 73만 · Nuki 61만 · Somuch 54만. Top 유가채널: ubsi 87만 · 이은별 59만(IG) · 카밍 51만(IG) · 뷰요미 51만(IG)", "[경쟁사 06-07] 다이소몰 뷰티 Top10: #1 VT PDRN토너 · #3\u00b7#10 마데카21 · #5\u00b7#7 본셉 · #6 VT시트마스크 · #11 더랩 부스터앰플. 전주 #1 마미케어는 Top10 이탈, VT가 #1 상승", "YT 키워드 최고조회수(175영상): VT PDRN 광채토너 133.9만(리틀약사) · 더마블록 선스틱 35.3만 · 줌 바이 정샘물 21.7만 · 본셉 비타씨 15.6만 · 더랩 바이 블랑두 7.2만(우리). 노이즈 \u0027윙크걸 기름종이\u0027(62만)는 중국드라마 오태깅으로 제외", "브랜드 매트릭스(Top10 내): VT 2SKU(평균3,000원) · 본셉 2SKU · 마데카21 2SKU · 더랩 1SKU. 메디필은 Top10 밖(#20)", "[경고] IG 릴스 스토어(ig_reel_store.json) 2026-05-07 이후 33일째 정지(stale) — IG 추정뷰(likes\u00d730)는 직전 스냅샷 추정치, 매트릭스에 *표기", "[보류] 플랫폼\u00d7유형 효율 매트릭스(platformData)는 모니터링 중복제거 방법론 변경으로 이번 사이클 재계산 보류 — 전주 값 유지", "유가 CPM 계약단가(19,639원) 기존 하드코딩값 유지", "데이터 소스: monitoring sheet(2026-06-08) / sales sheet(2026-06-08, 데이터는 05-27까지) / daiso_2026-06-07 / yt_2026-06-07 / ig_reel_store(05-07 stale)"]},
+{"date": "2026-06-02", "summary": "주간 자동 갱신 — 매출+모니터링+경쟁사 데이터 신규 반영 (2026-06-02)", "changes": ["누적 매출 → 75.46억(195일), 일평균 3,870만원", "이번 주 매출(2026-05-24 ~ 2026-05-27) 2.60억 / 전주 2.63억, WoW -1.2%", "라인 누적 비중: 물광 54.5% / 결광 38.2% / 옴므 7.3%", "코어3종(스킨핏프렙+물광크림+부스터앰플) 집중도 63.1% (47.62억)", "가속 SKU Top3: 결광 세럼미스트 150ml +48.9% · 옴므 올인원에멀전 120ml +7.9% · 물광틴티드커버크림 40 ml +2.0%", "모니터링 누적 328건: IG 71 / X 191 / YT 64 / 네이버 2 — 10만뷰+ 26건", "노출 유형: 무가 321 / 유가 7 (CPM 계약단가 19,639원 유지)", "V/S(조회수÷구독자) Top: 댕동이 @dangdooooong2 V/S=×1383 (트위터)", "다이소몰 뷰티 Top10: #1 마미케어 · #2 VT · #3 마데카21 · #6 본셉 · #7 본셉", "YT 키워드 최고: 후시덤 베리어 리페어 34.4만 / 입큰 퍼스널 톤 29.9만 / 태그 노세범 메쉬 22.3만", "브랜드 매트릭스(Top10 내): VT 1SKU · 본셉 2SKU · 마데카21 1SKU · 더랩 2SKU", "IG 인플루언서 풀: 137명 (2026-06-01 기준), Top 엔게이지먼트 @moon__brand eng=2,090", "데이터 소스: monitoring sheet(2026-06-01) / sales sheet(2026-06-01) / daiso_2026-06-02 / yt_2026-06-02 / influencers_2026-06-01"]},
+{"date": "2026-05-26", "summary": "주간 자동 갱신 — 매출+모니터링(5월 탭)+경쟁사 신규 데이터 반영", "changes": ["누적 매출 53.18억(136일) → 54.41억(141일)", "일평균 3,910만원 → 3,859만원", "라인별 누적 비중: 물광 54.3% / 결광 38.7% / 옴므 7.0%", "코어3종 집중도 63.0% (결광스킨핏프렙+물광크림+물광부스터앰플 = 34.30억)", "주차별 매출 차트에 W21(5/18~21, 부분주) 추가 — 직전 완결주 W20 2.67억, WoW(W20 vs W19) -11.2%", "최근14일(5/8~21) vs 직전14일 가속 SKU: 옴므선크림 +6.2% / 결광겔마스크 +0.6%; 약세: 결광세럼미스트 -41.4% / 옴므클렌징 -29.4% / 물광틴티드 -18.7%", "[구조변경] 모니터링 시트가 월별 탭으로 분리되어 read_file_content가 5월(169행)·1월(191행)·1~2월 수량(164행) 탭을 함께 반환. 지난주 '189건'은 1월 탭 수치였음 — 이번 주부터 '당월(5월)' 탭 기준 표기로 통일", "5월 모니터링 169건: IG 95 / X 66 / YT 8, 평균 28,715뷰, 10만뷰+ 6건, 누적 약 330만 뷰", "5월 분류: 무가(오가닉+무가시딩+이벤트) 103 / 유가(유가협업+체험단) 66; 노출 라인: OH(독립) 86 / 결광 37 / 물광 31 / 옴므 1 / 기타 20", "V/S(조회수÷구독자) 최고: 밍키 minkie__zips 843K뷰 / 2,024팔 = ×416 (IG, 물광크림)", "경쟁사 다이소몰 뷰티 Top10: 마데카21 #1 / 본셉 비타씨 #3 / VT PDRN #4 / 더랩 물광크림 #7·부스터앰플 #8 진입 (전주 #11 → #7 상승)", "경쟁사 YT 키워드 최고조회수: 본셉 비타씨 43.4만 / 후시덤 베리어리페어 29.8만 / 더랩 바이 블랑두 19.0만(우리) / VT 리들샷100 17.6만 / 더마블록 선스틱 14.8만", "[경고] IG 릴스 스토어(ig_reel_store.json)가 2026-05-07 이후 갱신 정지 — 19일 stale. IG 추정뷰(likes×30)는 직전 스냅샷 기준 추정치이며 경쟁사 매트릭스에 *표기", "[정상] YT 크롤은 신규 yt_*.json(2026-05-26)로 정상 수집 — 옛 yt_chrome_*(05-21 정지) 명명을 대체", "유가 CPM 계약단가(19,639원)는 기존 하드코딩값 유지"]},
+{"date": "2026-05-19", "summary": "주간 자동 갱신 — 매출+모니터링+경쟁사 신규 파이프라인 전환 첫 사이클", "changes": ["누적 매출 50.51억(129일) → 53.18억(136일)", "일평균 3,915만원 → 3,910만원", "라인별 비중: 물광 54.2% / 결광 38.8% / 옴므 6.9%", "코어3종 집중도 62.9% → 63.0%", "최근 14일 vs 직전 14일: 물광 +4.1% / 결광 +0.2% / 옴므 +2.7%", "가속 SKU Top3: 옴므 선크림 +25.4% / 물광 토너패드 +17.1% / 결광 겔마스크 +12.5%", "약세 SKU: 결광 세럼미스트 -20.8% / 옴므 클렌징폼 -10.1%", "주차별 매출 차트에 W20(5/11~5/17 부분) 추가", "모니터링 시트 modifiedTime 2026-05-18 — 189건 / 1,081만 뷰 누적", "경쟁사 데이터: 신규 파이프라인(daiso-monitor/logs) 첫 적용 — 다이소몰 뷰티 Top 10 / YT 41개 영상 / 인플루언서 60건", "다이소몰 Top 10: 마데카21 #1 / 본셉 #2 / VT #4 — 더랩 클리어히알 물광크림 #11 진입", "옛 경쟁사 시트(1Y9dbNY...jFVvI) deprecated — 신규 파이프라인으로 전환", "주간 WoW 매출: -11.2% (5/11~5/17 vs 5/4~5/10)", "변경 사항 14개 항목 일괄 갱신 완료"]}, {"date": "2026-05-12", "summary": "주간 자동 갱신 — 매출 +7일 동기화 (모니터링·경쟁사 변동 없음)", "changes": ["누적 매출 47.48억(122일) → 50.51억(129일)", "일평균 3,891만원 → 3,915만원", "라인별 비중: 물광 54.1% / 결광 39.0% / 옴므 6.9%", "코어3종 집중도 63.0% → 62.9%", "4월 매출 확정 11.51억(30영업일)", "최근 2주(W18+W19) 합산 5.88억", "라인 최근 2주 변화: 물광 +10.1% / 결광 +13.5% / 옴므 +13.2%", "결광 스킨핏프렙 최근 2주 -9.3% → +13.7% (반등 — W18+W19 vs W16+W17)", "결광 세럼미스트 최근 2주 +3.5% → +9.7% (회복 지속)", "결광 선에센스 최근 2주 +21.5% → +24.0% (가속 유지)", "옴므 클렌징폼 최근 2주 +109.7% → +32.3% (정상화 안정)", "주차별 매출 차트에 W19 추가 (5/4~5/10)", "모니터링 시트(186oWmU...PPk) modifiedTime 2026-05-11 — 본문 행 추가 없음. KPI(1,094건/3,744만 뷰) 유지", "경쟁사 시트(1Y9dbNY...jFVvI) modifiedTime 2026-04-17 — 변동 없음. 전주 값 유지"]}, {"date": "2026-05-11", "summary": "격주 자동 갱신 — 모니터링 xlsx 변동 없음 (전주 값 유지)", "changes": ["Source xlsx: 2025 더랩바이블랑두 모니터링(무가_유가).xlsx (Drive ID 1se2ONVLgrHXd6DUaCA3nlWAgiPmU3NcH)", "Drive modifiedTime 2025-07-09 — 직전 사이클 이후 신규 입력 없음", "재계산 결과: KPI·라인별 매출·CPM 모두 직전 값 동일", "일반 모니터링 시트 170행(노출 105 / 오가닉 65), 무가시딩 263행 (xlsx 자체 기준)", "주차 스냅샷 시트 17개 (2/14 ~ 5/30) 검증 OK", "다음 짝수 주차(2026-05-25, W22)에 다시 자동 트리거"]}, {"date": "2026-05-05", "summary": "주간 자동 갱신 — 매출+모니터링 동기화 (경쟁사 변동 없음)", "changes": ["누적 매출 44.63억(115일) → 47.48억(122일)", "일평균 3,881만원 → 3,891만원", "라인별 비중: 물광 54.1% / 결광 39.1% / 옴므 6.8%", "코어3종 집중도 63.0%", "결광 스킨핏프렙 최근 2주 -13.2% → -9.3% (W17+W18 vs W15+W16)", "결광 세럼미스트 최근 2주 -5.9% → +3.5% (회복 신호)", "라인 최근 2주: 물광 +4.3% / 결광 -2.7% / 옴므 +19.1%", "옴므 클렌징폼 최근 2주 +109.7% — 4월 24일 매출 대폭 증가 (확인 필요)", "결광 선에센스 최근 2주 +21.5% (가속 SKU)", "모니터링 콘텐츠 1,023건 → 1,094건", "누적 노출 3,584만 뷰 → 3,744만 뷰 (평균 47,579 뷰/건)", "X(트위터): 416건 / 1,667만 뷰 (avg 40,278)", "인스타: 468건 / 1,348만 뷰 (avg 78,383)", "유튜브: 198건 / 726만 뷰 (avg 36,680)", "경쟁사 시트(daiso-ig-master-log): 변동 없음(2026-04-17 마지막 업데이트) — 전주 값 유지"]}, {"date": "2026-04-28", "summary": "주간 자동 갱신 — 매출·모니터링·경쟁사 데이터 동기화", "changes": ["누적 매출 42.9억(111일) → 44.63억(115일)", "일평균 3,865만원 → 3,881만원", "라인별 비중: 물광 54.1% / 결광 39.2% / 옴므 6.7%", "코어3종 집중도 63.0%", "결광 스킨핏프렙 최근 2주 +10.8% → -13.2% (W16+W17 vs W14+W15)", "결광 세럼미스트 최근 2주 -5.5% → -5.9%", "라인 최근 2주 변화: 물광 -1.1% / 결광 -5.4% / 옴므 +0.9%", "모니터링 콘텐츠 965건 → 1,023건", "누적 노출 3,432만 뷰 → 3,584만 뷰 (평균 35,036 뷰/건)", "X(트위터): 396건 / 1,645만 뷰 (avg 41,551)", "인스타: 425건 / 1,219만 뷰 (avg 28,686)", "유튜브: 191건 / 718만 뷰 (avg 37,616)", "경쟁사 시트(daiso-ig-master-log)는 변동 없음 — 전주 값 유지 (Top: VT PDRN/본셉 비타씨/마데카21)"]}, {"date": "2026-04-27", "summary": "유가 계약 narrative를 모니터링 데이터 기반으로 재작성", "changes": ["유가협업 unique 채널 93명 분류: 검증재활용형 31명(33%)·중간형 37명(40%)·저점매수형 25명(27%)", "TL;DR 리스크 박스: \"5명 100% 저점매수\" 추정 → 실측 분포로 교체", "Part 4 Opinion 카드 전면 재작성 (저점매수 70:재활용 30 → 재활용 50:중간 30:저점 20 권고)", "검증재활용형 평균뷰 131,044 vs 저점매수형 평균뷰 8,029 — 16배 격차 명시", "무가시딩 실측: 337명·423건, 1만뷰+ 17%·10만뷰+ 5%로 보정 (이전 28%/8% 추정값 교체)", "Action Plan P1 첫 항목 권고 믹스 비율 수정", "최근 6주(W12+) 활동 중 유가 인플루언서 44명 명시"]}, {"date": "2026-04-27", "summary": "다이소 일별매출 RAW 통합 + 변경 이력 시작", "changes": ["누적 매출 41.97억(108일) → 42.9억(111일)", "일평균 3,890만원 → 3,865만원", "라인별 비중: 물광 54% / 결광 39% / 옴므 6.6% → 물광 54.1% / 결광 39.3% / 옴므 6.6%", "코어3종 집중도 63% → 63.1%", "결광 스킨핏프렙 최근 2주 +18.7% → +10.8% (W15+W16 vs W13+W14)", "결광 세럼미스트 최근 2주 -17.7% → -5.5% (급감 완화)", "물광 라인 최근 2주 +3.9% / 결광 +5.5% / 옴므 -11.9%", "주차별 매출 차트에 W17(부분) 추가", "다이소 일별매출 RAW를 매 격주 자동 반영하도록 SKILL.md 갱신"]}, {"date": "2026-04-24", "summary": "모니터링 시트 자동 갱신 (1회차)", "changes": ["모니터링 콘텐츠 957건 → 965건", "누적 노출 2,944만 뷰 → 3,432만 뷰", "평균 30,765 뷰/건 → 35,569 뷰/건", "X(트위터) 누적 1,594만 뷰 (377→378건)", "라인×타입 매트릭스 재계산 (CH 퍼펙트 무가 83,138 → 82,665 등)"]}]</script>
+<script>
+(function(){
+  var data = JSON.parse(document.getElementById('changelog-data').textContent);
+  var el = document.getElementById('changelogList');
+  data.slice(0, 5).forEach(function(entry, i){
+    var box = document.createElement('div');
+    box.style.cssText = 'padding:18px 24px;border-bottom:'+(i===data.length-1?'none':'1px solid var(--border)')+';';
+    var head = '<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:10px"><span style="font-size:13px;font-weight:800;color:var(--accent);letter-spacing:1px">'+entry.date+'</span><span style="font-size:15px;color:#fff;font-weight:700">'+entry.summary+'</span><span style="font-size:11px;color:var(--muted);background:rgba(167,139,250,0.12);padding:3px 8px;border-radius:6px">'+entry.changes.length+'개 변경</span></div>';
+    var ul = '<ul style="list-style:none;margin:0;padding:0">';
+    entry.changes.forEach(function(c){
+      ul += '<li style="font-size:13.5px;color:#c8cee0;padding:4px 0 4px 18px;position:relative;line-height:1.6"><span style="position:absolute;left:0;color:var(--accent2)">▸</span>'+c+'</li>';
+    });
+    ul += '</ul>';
+    box.innerHTML = head + ul;
+    el.appendChild(box);
   });
-});
-
-// 초기 렌더
-(() => {
-  document.getElementById('lastUpdated').textContent = new Date(DAISO_DATA.lastUpdated).toLocaleString('ko-KR');
-  renderTab(DAISO_DATA, 'daiso', false);
-  renderTab(OLIVEYOUNG_DATA, 'oliveyoung', true);
 })();
 </script>
 
+<footer>
+  <div>📊 더랩바이블랑두 × 다이소 전략 진단 대시보드 v2 · 2026.06.16 (auto-updated)</div>
+  <div class="data-src">데이터 소스: 다이소_일별매출_RAW(164일) · 2026 모니터링(1,632건·URL중복제거) · daiso_2026-06-16.json (Top10 뷰티) · yt_2026-06-16.json · ig_reel_store(06-13, 3일 stale) · 자동 갱신 2026-06-16</div>
+</footer>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const weeklyLine = {
+  labels: ["W01", "W02", "W03", "W04", "W05", "W06", "W07", "W08", "W09", "W10", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19", "W20", "W21", "W22", "W23", "W24"],
+  mulgwang: [7861, 13340, 16407, 16807, 17120, 13555, 14492, 14505, 15555, 13431, 13327, 13362, 13855, 14054, 15046, 13940, 14836, 15394, 16298, 15166, 14334, 14356, 12938, 11737],
+  gyeol:    [5217, 10336, 9820, 5038, 12315, 13737, 12408, 12064, 13165, 10694, 9856, 9829, 10223, 9930, 10774, 10080, 9504, 11000, 11228, 9320, 8966, 8894, 7689, 7005],
+  homme:    [1119, 1668, 1566, 1448, 1583, 1504, 1610, 1729, 1813, 1769, 1704, 1738, 2087, 2317, 1920, 1958, 2316, 2302, 2536, 2207, 2070, 2267, 2106, 2028],
+};
+const weeklySku = {
+  labels: weeklyLine.labels,
+  sku_prep:   [2472, 5692, 5260, 616, 7312, 9074, 7737, 6864, 7680, 5966, 5386, 4948, 5412, 5630, 6666, 5572, 5100, 5997, 6140, 5616, 5092, 4976, 4032, 3542],
+  cream:      [2556, 6140, 6418, 6846, 6923, 6532, 6164, 5566, 5914, 5167, 4942, 4980, 5439, 5453, 5990, 5640, 6050, 5976, 6281, 6420, 6128, 6005, 5358, 5232],
+  booster:    [3243, 3886, 6186, 6153, 5746, 3466, 4754, 5188, 5856, 5096, 5354, 5385, 5250, 5358, 5782, 5154, 5406, 5793, 6090, 5387, 5052, 5309, 4730, 4456],
+  mist:       [1588, 2724, 2784, 2746, 3266, 2920, 2882, 2876, 2942, 2791, 2674, 3167, 2908, 2558, 2444, 2361, 2346, 2630, 2534, 1406, 1744, 1930, 1801, 1619],
+  tinted:     [1485, 2157, 2235, 2297, 3030, 2230, 2204, 2317, 2402, 2008, 1852, 1870, 1997, 2041, 2233, 2134, 2324, 2422, 2594, 2157, 2164, 2066, 1834, 1195],
+};
+const recent = {
+  labels: ["결광 스킨핏프렙", "물광 틴티드", "물광 크림", "물광 부스터앰플", "옴므 토너", "옴므 선크림", "옴므 클렌징", "결광 겔마스크", "물광 스킨토너", "옴므 톤커버", "결광 젤클렌저", "결광 선에센스", "결광 세럼미스트"],
+  values: [-24.8, -28.4, -12.7, -11.3, -2.1, 19.3, -9.0, -44.9, -5.0, -9.1, 4.5, 1.6, -6.9],
+  abs_recent: [1327815000, 512460000, 1381220000, 1240810000, 48915000, 78450000, 93219000, 142073000, 232840000, 90015000, 100017000, 224590000, 596415000],
+};
+const kwData = {
+  labels: ['VT PDRN 광채','VT 리들샷 300','더마블록 선스틱','줌 바이 정샘물','더랩바이블랑두 (우리)','본셉 비타씨'],
+  values: [260.0, 71.7, 37.1, 29.6, 27.6, 25.5],
+  colors: ['rgba(147,197,253,0.85)','rgba(147,197,253,0.6)','rgba(255,143,163,0.85)','rgba(253,230,138,0.85)','rgba(167,139,250,0.95)','rgba(139,147,170,0.5)'],
+};
+const myReels = [
+  {author:'cos_fairyy', date:'2025.12.12', v:3033230, url:'https://www.instagram.com/reel/DSKTPjHD1-J/', likes:54362, cmts:93},
+  {author:'zingdong__', date:'2026.03.27', v:447385, url:'https://www.instagram.com/reel/DWYxvjjk1mr/', likes:7256, cmts:24},
+  {author:'lkho__o',    date:'2026.03.26', v:201811, url:'https://www.instagram.com/reel/DWV0ROTEvs0/', likes:3487, cmts:110},
+  {author:'byu.yomi',   date:'2026.04.12', v:62083, url:'https://www.instagram.com/reel/DXBWN4UEj5t/', likes:421, cmts:7},
+  {author:'ond_0a',     date:'2026.03.22', v:48473, url:'https://www.instagram.com/reel/DWLhelWkw51/', likes:3, cmts:2},
+  {author:'imnnano',    date:'2026.02.26', v:46024, url:'https://www.instagram.com/reel/DVOSElhApeO/', likes:3, cmts:0},
+  {author:'eunyuskin',  date:'2026.03.30', v:44033, url:'https://www.instagram.com/reel/DWgst-WjnDf/', likes:3, cmts:5},
+  {author:'ojirapper_', date:'2026.04.03', v:24697, url:'https://www.instagram.com/reel/DWqe22pxOdv/', likes:102, cmts:2},
+  {author:'makeup_.doha',date:'2026.02.13', v:17898, url:'https://www.instagram.com/reel/DUsa52_k9hx/', likes:219, cmts:4},
+  {author:'d.a.o.x',    date:'2026.04.13', v:12878, url:'https://www.instagram.com/reel/DXEYVAuEVUo/', likes:116, cmts:23},
+  {author:'sebimitgott',date:'2026.04.02', v:7354, url:'https://www.instagram.com/reel/DWoIEt0Af-Y/', likes:3, cmts:2},
+  {author:'myeong2_rang',date:'2026.03.19', v:6150, url:'https://www.instagram.com/reel/DWD1eN6kfgl/', likes:8, cmts:0},
+  {author:'gongguri__092',date:'2026.03.10', v:5220, url:'https://www.instagram.com/reel/DVscNZCExG6/', likes:3, cmts:18},
+  {author:'seoyan11',   date:'2026.03.05', v:4019, url:'https://www.instagram.com/reel/DVgSVZrE3Hy/', likes:77, cmts:18},
+  {author:'1donna.beauty',date:'2026.04.10', v:3829, url:'https://www.instagram.com/reel/DW8hAbGk-Zf/', likes:3, cmts:8},
+  {author:'popup_daram',date:'2026.04.09', v:3262, url:'https://www.instagram.com/reel/DW6JOemjauj/', likes:12, cmts:8},
+  {author:'miray_day',  date:'2026.04.13', v:1940, url:'https://www.instagram.com/reel/DXEVYd3TSGp/', likes:21, cmts:1},
+  {author:'nedon_rev',  date:'2026.02.18', v:1684, url:'https://www.instagram.com/reel/DU5kHVbEzO3/', likes:41, cmts:2},
+  {author:'guming_cosmetic',date:'2026.04.12', v:786, url:'https://www.instagram.com/reel/DXCKB2bD0VW/', likes:3, cmts:0},
+  {author:'nusa_naya',  date:'2026.04.12', v:610, url:'https://www.instagram.com/reel/DXA3f_qCcaY/', likes:11, cmts:0},
+  {author:'cosmetic_yeon_',date:'2024.10.07', v:503, url:'https://www.instagram.com/reel/DA0GPHgIATR/', likes:8, cmts:0},
+  {author:'ryu12883',   date:'2026.04.14', v:293, url:'https://www.instagram.com/reel/DXGabk7j7r3/', likes:16, cmts:32},
+  {author:'glowyuu.so', date:'2026.04.12', v:234, url:'https://www.instagram.com/reel/DXBrAm3Ep5p/', likes:8, cmts:5},
+];
+
+/* Top 무가시딩 channels (from monitoring data) */
+const muTop = [
+  {ch:'도로 @dorotice5', handle:'', sns:'X', v:5179200, posts:4, subs:30000, url:'https://x.com/dorotice5/status/2010300910854164512'},
+  {ch:'byudonna', handle:'', sns:'IG', v:1710000, posts:1, subs:40000, url:'https://www.instagram.com/reel/DYZhzExvMWR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='},
+  {ch:'lobit_beauty', handle:'', sns:'IG', v:1222000, posts:1, subs:4063, url:'https://www.instagram.com/reel/DWv7f37yaKi/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ=='},
+  {ch:'마르 @maleu557290', handle:'', sns:'X', v:1131901, posts:4, subs:6223, url:'https://x.com/maleu557290/status/2028044264194851132?s=20'},
+  {ch:'쿠키 @cookierush8282', handle:'', sns:'X', v:606000, posts:1, subs:9509, url:'https://x.com/cookierush8282/status/2056576529845596339?s=20'},
+  {ch:'ei_jyojyo23', handle:'', sns:'IG', v:575000, posts:2, subs:123000, url:'https://www.instagram.com/reel/DXOM4sDkbmX/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='},
+  {ch:'Somuch @Somuch7luck', handle:'', sns:'X', v:560821, posts:4, subs:1729, url:'https://x.com/Somuch7luck/status/2006965739287384169'},
+  {ch:'다영', handle:'', sns:'YT', v:399000, posts:2, subs:589000, url:'https://youtube.com/shorts/pg2lrn0OhuI?si=1XHbxkmnM1OFi8iW'},
+  {ch:'진자림', handle:'', sns:'IG', v:349737, posts:1, subs:749000, url:'https://youtube.com/shorts/TSmRv19BPNQ?si=8qY0e7MvX8Z0tc7W'},
+  {ch:'tabemacle', handle:'', sns:'IG', v:342000, posts:2, subs:141000, url:'https://www.instagram.com/reel/DZDKsvtPSsn/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='},
+];
+
+/* Top 유가협업 channels */
+const yuTop = [
+  {ch:'코덕요정', handle:'', sns:'YT', v:1646688, posts:8, subs:116000, url:'https://www.youtube.com/shorts/OzqPtkhQm8U'},
+  {ch:'ubsi @Whoop_sie', handle:'', sns:'X', v:1277200, posts:4, subs:41100, url:'https://x.com/Whoop_sie/status/2016119250520568147'},
+  {ch:'살림토끼', handle:'', sns:'IG', v:1037763, posts:8, subs:116000, url:'https://www.instagram.com/reel/DVTHWJwD3M5/'},
+  {ch:'Nuki @tenshi4everr3', handle:'', sns:'X', v:1006300, posts:2, subs:25300, url:'https://x.com/tenshi4everr3/status/2036777625956610506'},
+  {ch:'에디', handle:'', sns:'X', v:733100, posts:1, subs:26300, url:'https://x.com/remember_u7/status/2027704103581995474?s=46'},
+  {ch:'미미꽃', handle:'', sns:'IG', v:599000, posts:2, subs:153000, url:'https://www.instagram.com/reel/DYuOZDqxkSI/'},
+  {ch:'이은별', handle:'', sns:'IG', v:595350, posts:2, subs:26000, url:'https://www.instagram.com/reel/DYy1lXaRYMu/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='},
+  {ch:'Sally', handle:'', sns:'X', v:563500, posts:1, subs:194000, url:'https://x.com/ura_rola/status/2051951147334988083'},
+  {ch:'뷰요미', handle:'', sns:'IG', v:557643, posts:6, subs:44000, url:'https://www.instagram.com/reel/DYy8ku-SH71/'},
+  {ch:'한채영', handle:'', sns:'IG', v:537068, posts:2, subs:56000, url:'https://www.instagram.com/reel/DVVD9xFEiqw/'},
+];
+
+/* Platform comparison data */
+const platformData = {
+  labels: ['X(트위터)', '인스타', '유튜브 Shorts', '유튜브 Long'],
+  mu: [31369, 111121, 40773, 18598],
+  yu: [84168, 87139, 57078, 53363],
+  og: [43105, 68782, 43422, 19609],
+  cnt_mu: [269, 59, 30, 31],
+  cnt_yu: [65, 91, 37, 14],
+  cnt_og: [145, 121, 80, 55],
+};
+
+/* KPI dynamic data */
+const kpiData = {
+  '1': {
+    cum:    {title:"누적 다이소 매출", sub:"2026.01.01 ~ 2026-06-14 (164일)", val:"62.62", unit:"억원", delta:"일평균 3,818만원", dcls:"neu"},
+    week:   {title:"주간 매출 (최근 완전주)", sub:"W24 2026-06-08 ~ 06-14", val:"2.08", unit:"억원", delta:"전주(W23) 대비 -8.6%", dcls:"down"},
+    prev:   {title:"전주 매출", sub:"W23 2026-06-01 ~ 06-07", val:"2.27", unit:"억원", delta:"비교 기준", dcls:"neu"},
+    day:    {title:"일평균 매출", sub:"164영업일 평균", val:"3,818", unit:"만원", delta:"전체 평균", dcls:"neu"},
+  },
+  '2': {
+    core:    {title:"코어 3종 매출 집중도", sub:"스킨핏프렙+물광크림+부스터앰플", val:"63.1", unit:"%", delta:"▲ 3종 의존 과다", dcls:"down"},
+    mulgwang:{title:"물광 라인 비중", sub:"크림·부스터·틴티드·미스트·토너", val:"54.6", unit:"%", delta:"전체 매출 절반 이상", dcls:"neu"},
+    gyeol:   {title:"결광 라인 비중", sub:"스킨핏프렙·세럼미스트·선에센스 등", val:"38.2", unit:"%", delta:"누적 비중", dcls:"neu"},
+    homme:   {title:"옴므 라인 비중", sub:"토너·선크림·에멀전·클렌징·톤커버", val:"7.2", unit:"%", delta:"누적 비중", dcls:"neu"},
+  },
+  '3': {
+    g1:    {title:"가속 SKU 1위", sub:"옴므 선크림 35ml", val:"+19.3", unit:"%", delta:"최근14일 vs 직전14일", dcls:"neu"},
+    g2:    {title:"가속 SKU 2위", sub:"결광 젤클렌저 100g", val:"+4.5", unit:"%", delta:"최근14일 vs 직전14일", dcls:"neu"},
+    g3:    {title:"가속 SKU 3위", sub:"결광 선에센스 40ml", val:"+1.6", unit:"%", delta:"최근14일 vs 직전14일", dcls:"neu"},
+    core:  {title:"코어3종 매출", sub:"39.50억 / 전체 63.1%", val:"39.50", unit:"억원", delta:"3SKU 누적", dcls:"neu"},
+  },
+  '4': {
+    all: {title:'SNS 모니터링 — 누적', sub:'1,632건 · 10만뷰+ 126건', val:'5,319', unit:'만 뷰', delta:'평균 32,589 뷰/건', dcls:'neu'},
+    x:   {title:'X(트위터) 누적', sub:'600건', val:'600', unit:'건', delta:'평균 34,624 뷰', dcls:'neu'},
+    ig:  {title:'인스타 누적', sub:'754건', val:'754', unit:'건', delta:'평균 82,660 뷰(기록분)', dcls:'neu'},
+    yt:  {title:'유튜브 누적', sub:'247건', val:'247', unit:'건', delta:'평균 37,291 뷰', dcls:'neu'},
+  },
+};
+
+/* ---------- KPI Card switching ---------- */
+document.querySelectorAll('.kpi-tab').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const k = btn.dataset.kpi;
+    const m = btn.dataset.mode;
+    document.querySelectorAll(`.kpi-tab[data-kpi="${k}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const d = kpiData[k][m];
+    if (!d) return;
+    document.getElementById(`kpi${k}-title`).textContent = d.title;
+    document.getElementById(`kpi${k}-sub`).textContent = d.sub;
+    document.getElementById(`kpi${k}-val`).textContent = d.val;
+    document.getElementById(`kpi${k}-unit`).textContent = d.unit;
+    const deltaEl = document.getElementById(`kpi${k}-delta`);
+    deltaEl.textContent = d.delta;
+    deltaEl.className = 'delta ' + (d.dcls || 'neu');
+  });
+});
+
+/* Cycle through modes when card itself is clicked */
+document.querySelectorAll('.card.kpi').forEach(card => {
+  card.addEventListener('click', e => {
+    if (e.target.classList.contains('kpi-tab')) return;
+    const k = card.dataset.card;
+    const tabs = card.querySelectorAll('.kpi-tab');
+    let activeIdx = 0;
+    tabs.forEach((t,i) => { if (t.classList.contains('active')) activeIdx = i; });
+    const nextIdx = (activeIdx + 1) % tabs.length;
+    tabs[nextIdx].click();
+  });
+});
+
+/* ---------- Charts ---------- */
+Chart.defaults.color = '#c3cadb';
+Chart.defaults.font.family = "-apple-system, 'SF Pro Display', 'Pretendard', 'Noto Sans KR', sans-serif";
+Chart.defaults.font.size = 13;
+Chart.defaults.borderColor = '#263059';
+
+new Chart(document.getElementById('weeklyLineChart'),{
+  type:'line',
+  data:{
+    labels: weeklyLine.labels,
+    datasets:[
+      {label:'물광', data: weeklyLine.mulgwang, borderColor:'#a78bfa', backgroundColor:'rgba(167,139,250,0.15)', tension:0.35, borderWidth:3, pointRadius:4, fill:true},
+      {label:'결광', data: weeklyLine.gyeol, borderColor:'#6ee7ff', backgroundColor:'rgba(110,231,255,0.15)', tension:0.35, borderWidth:3, pointRadius:4, fill:true},
+      {label:'옴므', data: weeklyLine.homme, borderColor:'#fbbf24', backgroundColor:'rgba(251,191,36,0.12)', tension:0.35, borderWidth:2.5, pointRadius:4, fill:true},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{padding:16,font:{size:13}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString()}만원`}}},
+    scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'주별 매출 (만원)',font:{size:12}}},
+      x:{grid:{display:false}}}
+  }
+});
+
+new Chart(document.getElementById('weeklySkuChart'),{
+  type:'line',
+  data:{
+    labels: weeklySku.labels,
+    datasets:[
+      {label:'결광 스킨핏프렙', data: weeklySku.sku_prep, borderColor:'#6ee7ff', tension:0.3, borderWidth:3, pointRadius:3},
+      {label:'물광 크림', data: weeklySku.cream, borderColor:'#a78bfa', tension:0.3, borderWidth:2.5, pointRadius:3},
+      {label:'물광 부스터앰플', data: weeklySku.booster, borderColor:'#f87171', tension:0.3, borderWidth:2.5, pointRadius:3},
+      {label:'결광 세럼미스트', data: weeklySku.mist, borderColor:'#fbbf24', tension:0.3, borderWidth:2, pointRadius:3},
+      {label:'물광 틴티드', data: weeklySku.tinted, borderColor:'#4ade80', tension:0.3, borderWidth:2, pointRadius:3},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:12}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString()}만원`}}},
+    scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'주별 매출 (만원)',font:{size:12}}},
+      x:{grid:{display:false}}}
+  }
+});
+
+new Chart(document.getElementById('recentChart'),{
+  type:'bar',
+  data:{
+    labels: recent.labels,
+    datasets:[{
+      data: recent.values,
+      backgroundColor: recent.values.map(v => v>=0 ? 'rgba(74,222,128,0.8)' : 'rgba(248,113,113,0.8)'),
+      borderColor: recent.values.map(v => v>=0 ? '#4ade80' : '#f87171'),
+      borderWidth:1, borderRadius:6,
+    }]
+  },
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>{
+        const abs = recent.abs_recent[c.dataIndex];
+        return `${c.parsed.x>=0?'+':''}${c.parsed.x.toFixed(1)}% (최근 2주 합 ${abs.toLocaleString()}만원)`;
+      }}}},
+    scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'전 2주 대비 변화율 (%)',font:{size:12}}},
+      y:{grid:{display:false}, ticks:{font:{size:13}}}}
+  },
+  plugins:[{
+    afterDraw(chart){
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.font = '700 12px -apple-system';
+      chart.data.datasets[0].data.forEach((v,i)=>{
+        const m = chart.getDatasetMeta(0).data[i];
+        ctx.fillStyle = v>=0 ? '#4ade80' : '#f87171';
+        ctx.textAlign = v>=0 ? 'left' : 'right';
+        ctx.fillText(`${v>=0?'+':''}${v.toFixed(1)}%`, m.x + (v>=0?6:-6), m.y+4);
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+new Chart(document.getElementById('kwChart'),{
+  type:'bar',
+  data:{labels: kwData.labels, datasets:[{data:kwData.values, backgroundColor: kwData.colors, borderRadius:8}]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>`${c.parsed.y.toFixed(1)}만 뷰`}}},
+    scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'Top 4 릴스 합산 조회수 (만 뷰)',font:{size:12}}},
+      x:{grid:{display:false}, ticks:{font:{size:13}}}}
+  }
+});
+
+/* Platform chart - grouped bar showing 무가/유가/오가닉 average per platform */
+new Chart(document.getElementById('platformChart'),{
+  type:'bar',
+  data:{
+    labels: platformData.labels,
+    datasets:[
+      {label:'무가시딩 평균뷰', data: platformData.mu, backgroundColor:'rgba(74,222,128,0.75)', borderRadius:6},
+      {label:'유가협업 평균뷰', data: platformData.yu, backgroundColor:'rgba(248,113,113,0.75)', borderRadius:6},
+      {label:'오가닉 평균뷰', data: platformData.og, backgroundColor:'rgba(110,231,255,0.75)', borderRadius:6},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom',labels:{padding:14,font:{size:13}}},
+      tooltip:{callbacks:{
+        label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString()} 뷰`,
+        afterLabel:c=>{
+          const cnt = c.datasetIndex===0 ? platformData.cnt_mu[c.dataIndex] :
+                      c.datasetIndex===1 ? platformData.cnt_yu[c.dataIndex] :
+                                            platformData.cnt_og[c.dataIndex];
+          return `(${cnt}건 데이터 기준)`;
+        }
+      }}
+    },
+    scales:{
+      y:{grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'평균 조회수 (뷰)',font:{size:12}}},
+      x:{grid:{display:false}, ticks:{font:{size:14, weight:'700'}}}
+    }
+  }
+});
+
+/* Reel list */
+const reelListEl = document.getElementById('reelList');
+const maxV = myReels[0].v;
+myReels.forEach((r,i)=>{
+  const row = document.createElement('div');
+  row.className = 'reel-row';
+  let engClass = r.v >= 50000 ? '' : (r.v >= 10000 ? 'mid' : 'bad');
+  row.innerHTML = `
+    <div class="n ${i<3?'t':''}">${i+1}</div>
+    <div class="info">
+      <a href="${r.url}" target="_blank">@${r.author}</a>
+      <div class="d">${r.date} · 좋아요 ${r.likes.toLocaleString()} · 댓글 ${r.cmts}</div>
+      <div class="bar"><span style="width:${Math.min((r.v/maxV)*100, 100)}%;background:linear-gradient(90deg,#a78bfa,#6ee7ff)"></span></div>
+    </div>
+    <div class="views">${r.v >= 10000 ? (r.v/10000).toFixed(1)+'만' : r.v.toLocaleString()}<small>뷰</small></div>
+    <div class="eng ${engClass}">${r.v >= 50000 ? '✓ 안정' : r.v >= 10000 ? '○ 보통' : '✕ 약함'}</div>
+  `;
+  reelListEl.appendChild(row);
+});
+
+/* Leaderboard renderer */
+function renderLeader(elId, items, postFix){
+  const el = document.getElementById(elId);
+  items.forEach((r,i)=>{
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    const rankCls = i===0 ? 't1' : i===1 ? 't2' : i===2 ? 't3' : '';
+    const platCls = r.sns==='X' ? 'x' : r.sns==='IG' ? 'ig' : 'yt';
+    row.innerHTML = `
+      <div class="lb-rank ${rankCls}">${i+1}</div>
+      <div>
+        <div class="lb-name"><span class="plat-tag ${platCls}">${r.sns}</span><a href="${r.url}" target="_blank">${r.ch} ${r.handle ? '· '+r.handle : ''}</a></div>
+        <div class="lb-meta">${r.posts}건 · 팔로워 ${r.subs >= 10000 ? (r.subs/10000).toFixed(1)+'만' : r.subs.toLocaleString()}</div>
+      </div>
+      <div class="lb-val">${(r.v/10000).toFixed(1)}만<small>${postFix||'누적뷰'}</small></div>
+    `;
+    el.appendChild(row);
+  });
+}
+renderLeader('muLeader', muTop);
+renderLeader('yuLeader', yuTop);
+</script>
 </body>
 </html>
